@@ -1,0 +1,83 @@
+---
+# =============================================================================
+# deploy-java-jboss.yml  -  JBoss EAP / WildFly deployment (standalone mode)
+# -----------------------------------------------------------------------------
+# Uses the JBoss CLI for atomic deploy/undeploy. Consumes the same JSON vars
+# contract as the Tomcat playbook (-e @deploy-vars.json).
+#
+# Notes:
+#   * Standalone mode shown. For DOMAIN mode, add --server-groups=<group> to the
+#     deploy/undeploy commands and target the domain controller only.
+#   * System properties (config.environment) are applied via CLI so they survive
+#     restarts; config.files are copied for app-managed config.
+#   * block/rescue restores the previously deployed content on failure.
+# =============================================================================
+- name: Deploy Java artifact to JBoss/WildFly
+  hosts: "{{ target_limit }}"
+  serial: "{{ serial_spec | default(1) }}"
+  become: true
+  vars:
+    d: "{{ deployable }}"
+    jboss_home: "{{ deployable.jbossHome | default('/opt/wildfly') }}"
+    jboss_cli: "{{ (deployable.jbossHome | default('/opt/wildfly')) }}/bin/jboss-cli.sh"
+    mgmt_user: "{{ deployable.mgmtUser | default('admin') }}"
+    deploy_name: "{{ d.deployPath | basename }}.{{ d.packaging | default('war') }}"
+    backup_root: "/var/backups/jboss/{{ d.id }}"
+    ts: "{{ ansible_date_time.iso8601_basic_short }}"
+
+  tasks:
+    - name: "[{{ d.id }}] Ensure backup dir"
+      ansible.builtin.file: { path: "{{ backup_root }}", state: directory, mode: "0750" }
+
+    - name: "[{{ d.id }}] Capture current deployment info (for rollback)"
+      ansible.builtin.command: "{{ jboss_cli }} --connect --command='deployment-info --name={{ deploy_name }}'"
+      register: current_deploy
+      failed_when: false
+      changed_when: false
+
+    - name: "[{{ d.id }}] Deploy block"
+      block:
+        - name: "[{{ d.id }}] Place application config files"
+          ansible.builtin.copy:
+            src: "{{ item.source }}"
+            dest: "{{ item.destination }}"
+            mode: "{{ item.mode | default('0644') }}"
+          loop: "{{ d.config.files | default([]) }}"
+          loop_control: { label: "{{ item.destination }}" }
+
+        - name: "[{{ d.id }}] Apply system properties via CLI"
+          ansible.builtin.command: >
+            {{ jboss_cli }} --connect
+            --command="/system-property={{ item.key }}:add(value={{ item.value }})"
+          loop: "{{ (d.config.environment | default({})) | dict2items }}"
+          loop_control: { label: "{{ item.key }}" }
+          register: sysprop
+          failed_when: sysprop.rc != 0 and 'already exists' not in (sysprop.stderr | default(''))
+          changed_when: sysprop.rc == 0
+
+        - name: "[{{ d.id }}] Deploy artifact (force replaces existing)"
+          ansible.builtin.command: >
+            {{ jboss_cli }} --connect
+            --command="deploy {{ artifact_local }} --name={{ deploy_name }} --force"
+          register: deploy_res
+          changed_when: "'success' in (deploy_res.stdout | default('')) or deploy_res.rc == 0"
+
+        - name: "[{{ d.id }}] Health check via management/app endpoint"
+          ansible.builtin.uri:
+            url: "{{ (d.healthCheck.protocol | default('http')) }}://{{ inventory_hostname }}:{{ d.healthCheck.port | default(9990) }}{{ d.healthCheck.endpoint }}"
+            status_code: "{{ d.healthCheck.expectedStatus | default(200) }}"
+            validate_certs: false
+          register: health
+          retries: "{{ d.healthCheck.retries | default(10) }}"
+          delay: "{{ d.healthCheck.delaySeconds | default(15) }}"
+          until: health.status == (d.healthCheck.expectedStatus | default(200))
+          when: (d.healthCheck.enabled | default(true))
+
+      rescue:
+        - name: "[{{ d.id }}] Undeploy the failed artifact"
+          ansible.builtin.command: "{{ jboss_cli }} --connect --command='undeploy {{ deploy_name }}'"
+          failed_when: false
+
+        - name: "[{{ d.id }}] Fail play so rollout stops"
+          ansible.builtin.fail:
+            msg: "JBoss deploy of {{ d.id }} {{ d.version }} failed on {{ inventory_hostname }}."

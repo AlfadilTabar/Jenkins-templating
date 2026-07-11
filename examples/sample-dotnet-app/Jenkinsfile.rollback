@@ -1,0 +1,100 @@
+// =============================================================================
+// GENERATED FILE - one-click rollback job (Tier 2).
+//
+//   Application : settlement-portal
+//   Team        : channels-squad
+//   Type        : dotnet-iis-windows
+//   Generated   : 2026-07-10T01:29:26Z by platform-generator 1.0.0
+//
+//   Purpose : restore a previous good version of one or more deployables in a
+//             target environment, WITHOUT a rebuild. Reads the deployment ledger
+//             (.deploy-state) to determine the previous good version, then
+//             re-applies it through the same health-gated path as a deploy.
+//
+//   This is the deliberate, audited counterpart to the automatic rollback that
+//   fires from the deploy pipeline's post{ failure{} } block.
+// =============================================================================
+@Library('platform-shared-lib') _
+
+pipeline {
+    agent { label 'windows-deploy' }
+
+    parameters {
+        choice(name: 'TARGET_ENV', choices: ['prod', 'uat', 'dev'],
+               description: 'Environment to roll back (prod first - this is usually an incident action)')
+        string(name: 'SELECTOR', defaultValue: 'all',
+               description: "Comma-separated deployable ids to roll back, or 'all' for every live deployable")
+        string(name: 'TO_VERSION', defaultValue: '',
+               description: 'Optional: roll back to this exact version. Blank = previous good version from the ledger.')
+        string(name: 'ROLLBACK_REASON', defaultValue: '',
+               description: 'Change/incident reference for the audit trail (e.g. CHG-1234)')
+        string(name: 'CONFIRM', defaultValue: '',
+               description: "Type ROLLBACK to confirm - this changes a running environment")
+    }
+
+    options {
+        timestamps()
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '50'))
+    }
+
+    environment {
+        APP_NAME  = 'settlement-portal'
+        APP_TYPE  = 'dotnet-iis-windows'
+        // If stateTracking.mode=archive, point this at the deploy job so the
+        // ledger can be copied in. Ignored when stateTracking.mode=git.
+        DEPLOY_JOB = 'settlement-portal-deploy'
+    }
+
+    stages {
+        stage('Guard') {
+            steps {
+                script {
+                    if (params.CONFIRM != 'ROLLBACK') {
+                        error "Refusing to run: set CONFIRM=ROLLBACK to proceed."
+                    }
+                    if (!params.ROLLBACK_REASON?.trim()) {
+                        error "Refusing to run: ROLLBACK_REASON is required for the audit trail."
+                    }
+                }
+            }
+        }
+        stage('Checkout & Load Manifest') {
+            steps { platformCheckout(env: params.TARGET_ENV) }
+        }
+        stage('Restore Deployment Ledger') {
+            steps {
+                script {
+                    def m = readYaml file: "deploy/${params.TARGET_ENV}.yaml"
+                    platformState.restore(params.TARGET_ENV, (m.stateTracking ?: [:]))
+                    // Show the operator exactly what will happen before it happens.
+                    sh "platform-governance/steps/bash/rollback.sh ${params.TARGET_ENV} " +
+                       "${params.SELECTOR == 'all' ? '' : params.SELECTOR}"
+                }
+            }
+        }
+        stage('Approve Rollback') {
+            when { expression { params.TARGET_ENV in ['uat', 'prod'] } }
+            steps {
+                input message: "Roll back ${params.SELECTOR} in ${params.TARGET_ENV}? Reason: ${params.ROLLBACK_REASON}",
+                      ok: 'Roll back now'
+            }
+        }
+        stage('Roll Back') {
+            steps {
+                platformRollback(
+                    env: params.TARGET_ENV,
+                    ids: params.SELECTOR == 'all' ? 'all' : params.SELECTOR,
+                    toVersion: params.TO_VERSION,
+                    reason: params.ROLLBACK_REASON,
+                    executor: 'powershell',
+                    script: 'steps/powershell/deploy-iis.ps1'
+                )
+            }
+        }
+    }
+
+    post {
+        always { platformNotify(result: currentBuild.currentResult) }
+    }
+}

@@ -1,0 +1,25 @@
+---
+# deploy-python-systemd.yml - install a wheel into a venv and (re)start a systemd unit.
+- name: Deploy Python wheel as systemd service
+  hosts: "{{ server_group }}"
+  serial: "{{ serial_count | default(1) }}"
+  become: true
+  vars:
+    app_name: "{{ artifact_id.split(':')[1] }}"
+    venv: "/opt/{{ app_name }}/venv"
+    wheel_local: "artifacts/{{ app_name }}-{{ version }}.whl"
+  tasks:
+    - name: Ensure venv exists
+      ansible.builtin.command: "python3 -m venv {{ venv }}"
+      args: { creates: "{{ venv }}/bin/activate" }
+    - name: Copy wheel
+      ansible.builtin.copy: { src: "{{ wheel_local }}", dest: "/tmp/{{ app_name }}-{{ version }}.whl" }
+    - name: Install wheel
+      ansible.builtin.pip:
+        name: "/tmp/{{ app_name }}-{{ version }}.whl"
+        virtualenv: "{{ venv }}"
+        state: forcereinstall
+      notify: restart service
+  handlers:
+    - name: restart service
+      ansible.builtin.systemd: { name: "{{ app_name }}", state: restarted }

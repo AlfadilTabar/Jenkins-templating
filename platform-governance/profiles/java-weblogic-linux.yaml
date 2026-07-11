@@ -1,0 +1,52 @@
+apiVersion: platform/v1
+kind: Profile
+metadata:
+  name: java-weblogic-linux
+  description: >-
+    Java application (WAR/EAR) deployed to Oracle WebLogic Server on Linux via
+    Ansible + weblogic.Deployer. Targets a Managed Server or Cluster through the
+    Admin Server. Build-Once-Deploy-Many: the artifact versions listed in the
+    per-environment manifest are promoted dev -> uat -> prod unchanged.
+  maintainer: platform-engineering
+  os: linux
+  executor: ansible
+
+agent: linux-deploy
+
+# Canonical golden-path stage sequence for this application TYPE.
+# The generator renders one explicit stage() per entry. A descriptor may patch
+# this list via steps.add / steps.remove, EXCEPT for stages marked locked:true.
+stages:
+  - id: checkout
+    label: "Checkout & Load Manifest"
+    step: platformCheckout
+
+  - id: fetch
+    label: "Fetch Artifacts from Nexus"
+    step: platformFetch
+
+  - id: validate
+    label: "Validate Checksums & Manifest"
+    step: platformValidate
+    locked: true
+
+  - id: approval
+    label: "Deployment Approval"
+    step: platformApproval
+    gatedEnvs: [uat, prod]
+    locked: true
+
+  - id: deploy
+    label: "Deploy to WebLogic"
+    step: platformDeploy
+    playbook: steps/ansible/deploy-java-weblogic.yml
+    strategy: rolling
+    locked: true
+
+  - id: smokeTest
+    label: "Smoke Test"
+    step: platformSmokeTest
+
+rollback:
+  onFailure: true
+  step: platformRollback

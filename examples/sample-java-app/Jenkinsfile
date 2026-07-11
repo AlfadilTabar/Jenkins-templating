@@ -1,0 +1,90 @@
+// =============================================================================
+// GENERATED FILE - do not hand-edit the stage structure.
+//
+//   Application : payments-core
+//   Team        : payments-squad
+//   Type        : java-tomcat-linux
+//   Generated   : 2026-07-10T01:29:26Z by platform-generator 1.0.0
+//
+//   Regenerate  : run the 'pipeline-generator' job with this repo's
+//                 deployment-descriptor.yaml, review the produced artifact,
+//                 then commit it. Regeneration is only needed when the
+//                 application *type* changes - NOT when JARs/wheels/DLLs are
+//                 added or removed. Those live in deploy/<env>.yaml and are
+//                 read at runtime.
+// =============================================================================
+@Library('platform-shared-lib') _
+
+pipeline {
+    agent { label 'linux-deploy' }
+
+    parameters {
+        choice(name: 'TARGET_ENV', choices: ['dev', 'uat', 'prod'],
+               description: 'Target environment - selects deploy/<env>.yaml')
+        choice(name: 'DEPLOY_MODE', choices: ['targeted', 'full'],
+               description: 'targeted = deploy/undeploy the manifest\'s targeted lists | full = rebuild the whole environment from the full list')
+        string(name: 'SELECTOR', defaultValue: '',
+               description: 'targeted mode only: comma-separated deployable ids to deploy (blank = all in targeted.deploy)')
+        string(name: 'RELEASE_VERSION', defaultValue: '',
+               description: 'Optional BODM promote: pin all deployables to this version (overrides manifest)')
+    }
+
+    options {
+        timestamps()
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '30'))
+    }
+
+    environment {
+        APP_NAME = 'payments-core'
+        APP_TYPE = 'java-tomcat-linux'
+        MANIFEST = "deploy/${params.TARGET_ENV}.yaml"
+    }
+
+    stages {
+        stage('Checkout & Load Manifest') {
+            steps { platformCheckout(env: params.TARGET_ENV) }
+        }
+        stage('Fetch Artifacts from Nexus') {
+            steps { platformFetch(env: params.TARGET_ENV) }
+        }
+        stage('Validate Checksums & Manifest') {
+            steps { platformValidate(env: params.TARGET_ENV) }
+        }
+        stage('Fortify SAST Scan') {
+            steps { platformStep(name: 'fortify-scan', run: 'bash', script: '.platform/scripts/fortify-scan.sh', env: params.TARGET_ENV) }
+        }
+        stage('Deployment Approval') {
+            when { expression { params.TARGET_ENV in ['uat', 'prod'] } }
+            steps { platformApproval(env: params.TARGET_ENV) }
+        }
+        stage('Deploy to Tomcat') {
+            steps { platformDeploy(
+                env: params.TARGET_ENV,
+                stage: 'deploy',
+                executor: 'ansible',
+                playbook: 'steps/ansible/deploy-java-tomcat.yml',
+                defaultStrategy: 'rolling'
+            ) }
+        }
+        stage('Deploy Batch Tier') {
+            steps { platformDeploy(
+                env: params.TARGET_ENV,
+                stage: 'deploy-batch',
+                executor: 'ansible'
+            ) }
+        }
+        stage('Smoke Test') {
+            steps { platformSmokeTest(env: params.TARGET_ENV) }
+        }
+    }
+
+    post {
+        failure {
+            platformRollback(env: params.TARGET_ENV, scope: 'failed', executor: 'ansible', playbook: 'steps/ansible/deploy-java-tomcat.yml', reason: 'auto-rollback on pipeline failure')
+        }
+        always {
+            platformNotify(result: currentBuild.currentResult)
+        }
+    }
+}

@@ -1,0 +1,51 @@
+// =============================================================================
+// GENERATED FILE - do not hand-edit the stage structure.
+//
+//   Application : @APP_NAME@
+//   Team        : @APP_TEAM@
+//   Type        : @APP_TYPE@
+//   Generated   : @GENERATED_AT@ by platform-generator @GEN_VERSION@
+//
+//   Regenerate  : run the 'pipeline-generator' job with this repo's
+//                 deployment-descriptor.yaml, review the produced artifact,
+//                 then commit it. Regeneration is only needed when the
+//                 application *type* changes - NOT when JARs/wheels/DLLs are
+//                 added or removed. Those live in deploy/<env>.yaml and are
+//                 read at runtime.
+// =============================================================================
+@Library('platform-shared-lib') _
+
+pipeline {
+    agent { label '@AGENT@' }
+
+    parameters {
+        choice(name: 'TARGET_ENV', choices: ['dev', 'uat', 'prod'],
+               description: 'Target environment - selects deploy/<env>.yaml')
+        choice(name: 'DEPLOY_MODE', choices: ['targeted', 'full'],
+               description: 'targeted = deploy/undeploy the manifest\'s targeted lists | full = rebuild the whole environment from the full list')
+        string(name: 'SELECTOR', defaultValue: '',
+               description: 'targeted mode only: comma-separated deployable ids to deploy (blank = all in targeted.deploy)')
+        string(name: 'RELEASE_VERSION', defaultValue: '',
+               description: 'Optional BODM promote: pin all deployables to this version (overrides manifest)')
+    }
+
+    options {
+        timestamps()
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '30'))
+    }
+
+    environment {
+        APP_NAME = '@APP_NAME@'
+        APP_TYPE = '@APP_TYPE@'
+        MANIFEST = "deploy/${params.TARGET_ENV}.yaml"
+    }
+
+    stages {
+@STAGES@
+    }
+
+    post {
+@POST@
+    }
+}

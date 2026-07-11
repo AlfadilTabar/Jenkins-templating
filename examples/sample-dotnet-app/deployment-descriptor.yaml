@@ -1,0 +1,13 @@
+apiVersion: platform/v1
+kind: DeploymentDescriptor
+application:
+  name: settlement-portal
+  team: channels-squad
+type: dotnet-iis-windows
+steps:
+  add:
+    - id: db-migrate
+      label: "EF Core DB Migration"
+      after: validate
+      run: powershell
+      script: .platform/scripts/db-migrate.ps1

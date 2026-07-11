@@ -1,0 +1,31 @@
+# =============================================================================
+# deployment-descriptor.yaml  (GENERATION input - read ONLY by the generator)
+# Carries the application TYPE and the single customization lever: steps.add /
+# steps.remove. No hooks, no environment config, no artifact list.
+# =============================================================================
+apiVersion: platform/v1
+kind: DeploymentDescriptor
+
+application:
+  name: payments-core
+  team: payments-squad
+
+type: java-tomcat-linux
+
+# The only customization power. Patches the canonical stage sequence.
+steps:
+  add:
+    # a security gate the platform standard doesn't include by default
+    - id: fortify-scan
+      label: "Fortify SAST Scan"
+      after: validate
+      run: bash
+      script: .platform/scripts/fortify-scan.sh
+
+    # an extra DEPLOY stage; deployables bind to it via `stage: deploy-batch`
+    - id: deploy-batch
+      label: "Deploy Batch Tier"
+      after: deploy
+      run: deploy
+  # remove: [smokeTest]   # (example) uncomment to opt out of the standard smoke test
+  #                       # NOTE: removing 'validate', 'approval' or 'deploy' is refused (locked)

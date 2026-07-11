@@ -1,0 +1,184 @@
+apiVersion: platform/v1
+kind: DeploymentManifest
+metadata:
+  environment: uat
+  description: UAT - payments platform
+  lastGoodVersion: 1.8.2
+inventory: inventory/uat.ini
+targeted:
+  deploy:
+  - id: payment-api
+    artifactId: sa.bank.payments:payment-api
+    version: 1.9.0-hotfix
+    packaging: war
+    deployPath: /opt/tomcat/webapps/payments
+    serverGroup: app-tier
+    stage: deploy
+    deploymentStrategy: rolling
+    deploymentOrder: 10
+    dependsOn: []
+    timeout:
+      deploy: 300
+      healthCheck: 120
+    healthCheck:
+      enabled: true
+      endpoint: /payments/health
+      port: 8080
+      protocol: http
+      expectedStatus: 200
+      retries: 12
+      delaySeconds: 10
+    config:
+      environment:
+        PAYMENTS_DB_HOST: db-uat.internal
+        PAYMENTS_DB_PORT: '1521'
+        PAYMENTS_DB_NAME: PAYDB
+        LOG_LEVEL: INFO
+        FEATURE_FLAG_NEW_ROUTING: 'true'
+      files:
+      - source: .platform/config/application-uat.properties
+        destination: /opt/tomcat/conf/Catalina/localhost/payments.properties
+        mode: '0644'
+      jenkinsSecrets:
+      - credentialId: nexus-deploy-user
+        envVar: NEXUS_CREDENTIALS
+      - credentialId: payments-db-password
+        envVar: PAYMENTS_DB_PASSWORD
+    preHooks:
+    - id: drain
+      playbook: platform-governance/steps/ansible/drain-tomcat.yml
+      runOn: serverGroup
+      timeout: 60
+    - id: pre
+      script: .platform/scripts/pre-payment-api.sh
+      runOn: local
+    postHooks:
+    - id: smoke
+      script: .platform/scripts/smoke-payment-api.sh
+      runOn: local
+  undeploy:
+  - id: old-payment-service
+    deployPath: /opt/tomcat/webapps/old-payment-service
+    serverGroup: app-tier
+    packaging: war
+full:
+  deployables:
+  - id: payment-api
+    artifactId: sa.bank.payments:payment-api
+    version: 1.8.2
+    packaging: war
+    deployPath: /opt/tomcat/webapps/payments
+    serverGroup: app-tier
+    stage: deploy
+    deploymentStrategy: rolling
+    deploymentOrder: 10
+    dependsOn: []
+    timeout:
+      deploy: 300
+      healthCheck: 120
+    healthCheck:
+      enabled: true
+      endpoint: /payments/health
+      port: 8080
+      protocol: http
+      expectedStatus: 200
+      retries: 12
+      delaySeconds: 10
+    config:
+      environment:
+        PAYMENTS_DB_HOST: db-uat.internal
+        PAYMENTS_DB_PORT: '1521'
+        PAYMENTS_DB_NAME: PAYDB
+        LOG_LEVEL: INFO
+        FEATURE_FLAG_NEW_ROUTING: 'true'
+      files:
+      - source: .platform/config/application-uat.properties
+        destination: /opt/tomcat/conf/Catalina/localhost/payments.properties
+        mode: '0644'
+      jenkinsSecrets:
+      - credentialId: nexus-deploy-user
+        envVar: NEXUS_CREDENTIALS
+      - credentialId: payments-db-password
+        envVar: PAYMENTS_DB_PASSWORD
+    preHooks:
+    - id: drain
+      playbook: platform-governance/steps/ansible/drain-tomcat.yml
+      runOn: serverGroup
+      timeout: 60
+    - id: pre
+      script: .platform/scripts/pre-payment-api.sh
+      runOn: local
+    postHooks:
+    - id: smoke
+      script: .platform/scripts/smoke-payment-api.sh
+      runOn: local
+  - id: payment-worker
+    artifactId: sa.bank.payments:payment-worker
+    version: 1.8.2
+    packaging: war
+    deployPath: /opt/tomcat/webapps/workers
+    serverGroup: worker-tier
+    stage: deploy
+    deploymentStrategy: all-at-once
+    deploymentOrder: 20
+    dependsOn:
+    - payment-api
+    timeout:
+      deploy: 300
+      healthCheck: 120
+    healthCheck:
+      enabled: true
+      endpoint: /workers/health
+      port: 8080
+      protocol: http
+      expectedStatus: 200
+      retries: 10
+      delaySeconds: 15
+    config:
+      environment:
+        PAYMENTS_DB_HOST: db-uat.internal
+        WORKER_THREADS: '10'
+        LOG_LEVEL: INFO
+      jenkinsSecrets:
+      - credentialId: nexus-deploy-user
+        envVar: NEXUS_CREDENTIALS
+      - credentialId: payments-db-password
+        envVar: PAYMENTS_DB_PASSWORD
+    preHooks:
+    - id: stop-workers
+      script: .platform/scripts/stop-workers.sh
+      runOn: serverGroup
+  - id: payment-batch
+    artifactId: sa.bank.payments:payment-batch
+    version: 1.8.2
+    packaging: jar
+    deployPath: /opt/batch/jobs/payment-batch
+    serverGroup: batch-tier
+    targetServers:
+    - batch-01
+    stage: deploy-batch
+    deploymentStrategy: all-at-once
+    deploymentOrder: 30
+    dependsOn:
+    - payment-api
+    - payment-worker
+    timeout:
+      deploy: 600
+      healthCheck: 180
+    healthCheck:
+      enabled: false
+    config:
+      environment:
+        BATCH_DB_HOST: db-uat.internal
+        BATCH_CONCURRENCY: '4'
+        LOG_LEVEL: DEBUG
+      jenkinsSecrets:
+      - credentialId: nexus-deploy-user
+        envVar: NEXUS_CREDENTIALS
+      - credentialId: batch-db-password
+        envVar: BATCH_DB_PASSWORD
+    preHooks:
+    - id: backup-db
+      script: .platform/scripts/backup-batch-db.sh
+      runOn: 'specificServer: db-primary-01'
+      timeout: 300

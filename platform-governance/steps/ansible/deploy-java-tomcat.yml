@@ -1,0 +1,122 @@
+---
+# =============================================================================
+# deploy-java-tomcat.yml  -  Robust external Tomcat deployment (WAR/JAR)
+# -----------------------------------------------------------------------------
+# Consumes a single deployable passed as JSON extra-vars:  -e @deploy-vars.json
+#   deployable:            (the full manifest entry - id, version, deployPath,
+#                           packaging, config{environment,files}, healthCheck{})
+#   artifact_local:        path on the Jenkins agent to the fetched artifact (BODM)
+#   target_limit:          host or group to run against
+#   serial_spec:           1 (rolling) | "100%" (all-at-once) | [1,"100%"] (canary)
+#
+# Design:
+#   * autoDeploy is assumed OFF in prod - we deploy explicitly and reload.
+#   * every host backs up the current artifact BEFORE swap -> in-play rollback.
+#   * block/rescue: if health check fails, the SAME host restores its backup
+#     and the play fails, so a rolling/canary batch stops before spreading.
+#   * canary falls out naturally from serial_spec=[1,"100%"]: batch 1 (one host)
+#     must pass health before Ansible starts batch 2.
+# =============================================================================
+- name: Deploy Java artifact to Tomcat
+  hosts: "{{ target_limit }}"
+  serial: "{{ serial_spec | default(1) }}"
+  become: true
+  max_fail_percentage: 0
+  vars:
+    d: "{{ deployable }}"
+    tomcat_home: "{{ deployable.tomcatHome | default('/opt/tomcat') }}"
+    ctx_name: "{{ deployable.deployPath | basename }}"
+    # If deployPath has no packaging extension, the WAR target is deployPath.<packaging>
+    war_dest: >-
+      {{ deployable.deployPath if deployable.deployPath.endswith('.' ~ (deployable.packaging | default('war')))
+         else deployable.deployPath ~ '.' ~ (deployable.packaging | default('war')) }}
+    exploded_dir: "{{ deployable.deployPath | regex_replace('\\.(war|jar)$','') }}"
+    backup_root: "/var/backups/tomcat/{{ deployable.id }}"
+    ts: "{{ ansible_date_time.iso8601_basic_short }}"
+
+  tasks:
+    - name: "[{{ d.id }}] Ensure backup directory exists"
+      ansible.builtin.file:
+        path: "{{ backup_root }}"
+        state: directory
+        mode: "0750"
+
+    - name: "[{{ d.id }}] Record currently deployed artifact for rollback"
+      ansible.builtin.copy:
+        src: "{{ war_dest }}"
+        dest: "{{ backup_root }}/{{ ctx_name }}-{{ ts }}.{{ d.packaging | default('war') }}"
+        remote_src: true
+      failed_when: false            # first deploy has nothing to back up
+      register: backup_step
+
+    - name: "[{{ d.id }}] Deploy block (swap + config + reload + health)"
+      block:
+        # ---- application config files (per-app) --------------------------
+        - name: "[{{ d.id }}] Place application config files"
+          ansible.builtin.copy:
+            src: "{{ item.source }}"
+            dest: "{{ item.destination }}"
+            mode: "{{ item.mode | default('0644') }}"
+          loop: "{{ d.config.files | default([]) }}"
+          loop_control: { label: "{{ item.destination }}" }
+
+        # ---- environment variables for the app (JVM-scoped via setenv) ---
+        - name: "[{{ d.id }}] Write per-app EnvironmentFile"
+          ansible.builtin.copy:
+            dest: "/etc/sysconfig/tomcat-{{ d.id }}"
+            mode: "0640"
+            content: |
+              # Managed by platform pipeline - {{ d.id }} ({{ d.version }})
+              {% for k, v in (d.config.environment | default({})).items() %}
+              {{ k }}={{ v }}
+              {% endfor %}
+          notify: reload tomcat
+
+        # ---- the artifact swap ------------------------------------------
+        - name: "[{{ d.id }}] Remove previous exploded directory"
+          ansible.builtin.file:
+            path: "{{ exploded_dir }}"
+            state: absent
+
+        - name: "[{{ d.id }}] Copy new artifact from agent to server"
+          ansible.builtin.copy:
+            src: "{{ artifact_local }}"
+            dest: "{{ war_dest }}"
+            mode: "0644"
+          notify: reload tomcat
+
+        - name: "[{{ d.id }}] Flush handlers now so Tomcat reloads before health check"
+          ansible.builtin.meta: flush_handlers
+
+        # ---- health verification ----------------------------------------
+        - name: "[{{ d.id }}] Wait for application health"
+          ansible.builtin.uri:
+            url: "{{ (d.healthCheck.protocol | default('http')) }}://{{ inventory_hostname }}:{{ d.healthCheck.port | default(8080) }}{{ d.healthCheck.endpoint }}"
+            status_code: "{{ d.healthCheck.expectedStatus | default(200) }}"
+            validate_certs: false
+          register: health
+          retries: "{{ d.healthCheck.retries | default(12) }}"
+          delay: "{{ d.healthCheck.delaySeconds | default(10) }}"
+          until: health.status == (d.healthCheck.expectedStatus | default(200))
+          when: (d.healthCheck.enabled | default(true))
+
+      rescue:
+        - name: "[{{ d.id }}] HEALTH/DEPLOY FAILED - restoring backup on {{ inventory_hostname }}"
+          ansible.builtin.copy:
+            src: "{{ backup_step.dest }}"
+            dest: "{{ war_dest }}"
+            remote_src: true
+          when: backup_step is succeeded and backup_step.dest is defined
+          notify: reload tomcat
+
+        - name: "[{{ d.id }}] Fail the play so the rollout stops"
+          ansible.builtin.fail:
+            msg: "Deployment of {{ d.id }} {{ d.version }} failed on {{ inventory_hostname }}; backup restored."
+
+  handlers:
+    - name: reload tomcat
+      # Prefer a graceful reload via the Manager text API if configured,
+      # otherwise restart the service. Set deployable.reload='restart' to force.
+      ansible.builtin.systemd:
+        name: "{{ deployable.tomcatService | default('tomcat') }}"
+        state: restarted

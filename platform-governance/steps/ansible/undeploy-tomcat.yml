@@ -1,0 +1,20 @@
+---
+# undeploy-tomcat.yml - remove an application from Tomcat by deployPath.
+# Consumes: undeploy_path (e.g. /opt/tomcat/webapps/old-service), packaging.
+- name: Undeploy Tomcat application
+  hosts: "{{ target_limit }}"
+  become: true
+  vars:
+    pkg: "{{ packaging | default('war') }}"
+    war_file: "{{ undeploy_path if undeploy_path.endswith('.' ~ pkg) else undeploy_path ~ '.' ~ pkg }}"
+    exploded: "{{ undeploy_path | regex_replace('\\.(war|jar)$','') }}"
+  tasks:
+    - name: Remove WAR/JAR
+      ansible.builtin.file: { path: "{{ war_file }}", state: absent }
+      notify: reload tomcat
+    - name: Remove exploded directory (Tomcat auto-undeploys on reload)
+      ansible.builtin.file: { path: "{{ exploded }}", state: absent }
+      notify: reload tomcat
+  handlers:
+    - name: reload tomcat
+      ansible.builtin.systemd: { name: "{{ tomcat_service | default('tomcat') }}", state: restarted }

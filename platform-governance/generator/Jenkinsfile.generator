@@ -1,0 +1,36 @@
+// The generator job. Run this, feed it the app repo + descriptor path, and it
+// archives a Jenkinsfile you review and commit. Nothing is auto-pushed.
+@Library('platform-shared-lib') _
+
+pipeline {
+    agent { label 'linux' }
+    parameters {
+        string(name: 'APP_REPO_URL',  defaultValue: '', description: 'Git URL of the application repo')
+        string(name: 'APP_REPO_BRANCH', defaultValue: 'main', description: 'Branch to read the descriptor from')
+        string(name: 'DESCRIPTOR',    defaultValue: 'deployment-descriptor.yaml', description: 'Path to the type-only descriptor within the app repo')
+    }
+    stages {
+        stage('Checkout governance') {
+            steps { checkout scm }   // this repo (platform-governance) provides profiles + template
+        }
+        stage('Checkout application') {
+            steps {
+                dir('app') {
+                    git url: params.APP_REPO_URL, branch: params.APP_REPO_BRANCH
+                }
+            }
+        }
+        stage('Generate Jenkinsfile') {
+            steps {
+                generateJenkinsfile(
+                    descriptor: "app/${params.DESCRIPTOR}",
+                    governance: '.',
+                    out:        'Jenkinsfile.generated'
+                )
+            }
+        }
+    }
+    post {
+        success { echo 'Review the archived Jenkinsfile.generated, then commit it into the application repo.' }
+    }
+}

@@ -1,0 +1,80 @@
+---
+# =============================================================================
+# deploy-dotnet-iis.yml - IIS deployment using Ansible win_* modules (WinRM).
+# Alternative to deploy-iis.ps1 for teams that prefer Ansible end-to-end.
+# Same JSON vars contract (-e @deploy-vars.json).
+# =============================================================================
+- name: Deploy .NET artifact to IIS
+  hosts: "{{ target_limit }}"
+  serial: "{{ serial_spec | default('100%') }}"
+  vars:
+    d: "{{ deployable }}"
+    app_name: "{{ d.deployPath | basename }}"
+    site_path: "{{ d.deployPath }}"
+    pool_name: "{{ d.appPool | default(d.deployPath | basename) }}"
+    backup_dir: 'C:\deploy\_backup\{{ d.id }}-{{ ansible_date_time.iso8601_basic_short }}'
+  tasks:
+    - name: "[{{ d.id }}] Stop app pool"
+      ansible.windows.win_iis_webapppool:
+        name: "{{ pool_name }}"
+        state: stopped
+
+    - name: "[{{ d.id }}] Backup current content"
+      community.windows.win_robocopy:
+        src: "{{ site_path }}"
+        dest: "{{ backup_dir }}"
+        flags: /MIR
+      failed_when: false
+
+    - name: "[{{ d.id }}] Deploy block"
+      block:
+        - name: "[{{ d.id }}] Copy artifact to target"
+          ansible.windows.win_copy:
+            src: "{{ artifact_local }}"
+            dest: 'C:\deploy\_incoming\{{ app_name }}-{{ d.version }}\'
+
+        - name: "[{{ d.id }}] Mirror into site path"
+          community.windows.win_robocopy:
+            src: 'C:\deploy\_incoming\{{ app_name }}-{{ d.version }}'
+            dest: "{{ site_path }}"
+            flags: /MIR
+
+        - name: "[{{ d.id }}] Set app-pool environment variables"
+          community.windows.win_iis_webapppool:
+            name: "{{ pool_name }}"
+            attributes:
+              environmentVariables: "{{ d.config.environment | default({}) }}"
+          failed_when: false
+
+        - name: "[{{ d.id }}] Place config files"
+          ansible.windows.win_copy:
+            src: "{{ item.source }}"
+            dest: "{{ item.destination }}"
+          loop: "{{ d.config.files | default([]) }}"
+          loop_control: { label: "{{ item.destination }}" }
+
+        - name: "[{{ d.id }}] Start app pool"
+          ansible.windows.win_iis_webapppool:
+            name: "{{ pool_name }}"
+            state: started
+
+        - name: "[{{ d.id }}] Health check"
+          ansible.windows.win_uri:
+            url: "{{ (d.healthCheck.protocol | default('http')) }}://{{ inventory_hostname }}:{{ d.healthCheck.port | default(80) }}{{ d.healthCheck.endpoint }}"
+            status_code: "{{ d.healthCheck.expectedStatus | default(200) }}"
+          register: health
+          retries: "{{ d.healthCheck.retries | default(12) }}"
+          delay: "{{ d.healthCheck.delaySeconds | default(10) }}"
+          until: health.status_code == (d.healthCheck.expectedStatus | default(200))
+          when: (d.healthCheck.enabled | default(true))
+
+      rescue:
+        - name: "[{{ d.id }}] Restore backup"
+          community.windows.win_robocopy:
+            src: "{{ backup_dir }}"
+            dest: "{{ site_path }}"
+            flags: /MIR
+        - name: "[{{ d.id }}] Restart pool + fail"
+          ansible.windows.win_iis_webapppool: { name: "{{ pool_name }}", state: started }
+        - name: "[{{ d.id }}] Fail"
+          ansible.builtin.fail: { msg: "IIS deploy of {{ d.id }} failed on {{ inventory_hostname }}." }

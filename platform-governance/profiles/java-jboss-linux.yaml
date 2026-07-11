@@ -1,0 +1,39 @@
+apiVersion: platform/v1
+kind: Profile
+metadata:
+  name: java-jboss-linux
+  description: >-
+    Java application (EAR/WAR/JAR) deployed to external JBoss/WildFly on Linux
+    via Ansible using the JBoss CLI. Build-Once-Deploy-Many.
+  maintainer: platform-engineering
+  os: linux
+  executor: ansible
+agent: linux-deploy
+stages:
+  - id: checkout
+    label: "Checkout & Load Manifest"
+    step: platformCheckout
+  - id: fetch
+    label: "Fetch Artifacts from Nexus"
+    step: platformFetch
+  - id: validate
+    label: "Validate Checksums & Manifest"
+    step: platformValidate
+    locked: true
+  - id: approval
+    label: "Deployment Approval"
+    step: platformApproval
+    gatedEnvs: [uat, prod]
+    locked: true
+  - id: deploy
+    label: "Deploy to JBoss"
+    step: platformDeploy
+    playbook: steps/ansible/deploy-java-jboss.yml
+    strategy: rolling
+    locked: true
+  - id: smokeTest
+    label: "Smoke Test"
+    step: platformSmokeTest
+rollback:
+  onFailure: true
+  step: platformRollback

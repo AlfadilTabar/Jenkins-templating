@@ -1,0 +1,18 @@
+---
+# drain-tomcat.yml - gracefully drain a Tomcat node before deploy (pre-hook).
+# Marks the node down at the load balancer file flag and waits for in-flight
+# requests to complete. Adapt the LB signalling to your F5/HAProxy setup.
+- name: Drain Tomcat node
+  hosts: "{{ target_limit | default(server_group) }}"
+  become: true
+  vars:
+    drain_wait: "{{ drain_seconds | default(30) }}"
+  tasks:
+    - name: Signal load balancer to stop new traffic (health flag down)
+      ansible.builtin.file:
+        path: /opt/tomcat/health/DRAIN
+        state: touch
+        mode: "0644"
+    - name: Wait for in-flight requests to complete
+      ansible.builtin.pause:
+        seconds: "{{ drain_wait }}"

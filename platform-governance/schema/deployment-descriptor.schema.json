@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DeploymentDescriptor",
+  "description": "TYPE-only generation input. The single customization lever is steps.add/remove.",
+  "type": "object",
+  "required": ["kind", "type", "application"],
+  "properties": {
+    "apiVersion": { "type": "string" },
+    "kind": { "const": "DeploymentDescriptor" },
+    "application": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "team": { "type": "string" }
+      }
+    },
+    "type": { "type": "string", "description": "Profile name in platform-governance/profiles/" },
+    "steps": {
+      "type": "object",
+      "properties": {
+        "add": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id"],
+            "properties": {
+              "id": { "type": "string" },
+              "label": { "type": "string" },
+              "after": { "type": "string" },
+              "before": { "type": "string" },
+              "run": { "enum": ["bash", "python", "powershell", "ansible", "deploy"] },
+              "script": { "type": "string" },
+              "playbook": { "type": "string" }
+            }
+          }
+        },
+        "remove": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

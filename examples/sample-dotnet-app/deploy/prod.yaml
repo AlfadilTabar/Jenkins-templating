@@ -1,0 +1,127 @@
+apiVersion: platform/v1
+kind: DeploymentManifest
+metadata:
+  environment: prod
+  description: PROD - settlement portal
+  lastGoodVersion: 3.4.1
+inventory: inventory/prod.ini
+targeted:
+  deploy:
+  - id: settlement-web
+    artifactId: sa.bank.channels:SettlementPortal
+    version: 3.4.1
+    packaging: dll
+    deployPath: C:/inetpub/settlement/web
+    serverGroup: web-tier
+    appPool: SettlementPortal
+    stage: deploy
+    deploymentStrategy: rolling
+    deploymentOrder: 10
+    dependsOn: []
+    timeout:
+      deploy: 300
+      healthCheck: 120
+    healthCheck:
+      enabled: true
+      endpoint: /health
+      port: 80
+      protocol: https
+      expectedStatus: 200
+      retries: 12
+      delaySeconds: 10
+    config:
+      environment:
+        ASPNETCORE_ENVIRONMENT: prod
+        ConnectionStrings__Default: Server=db-prod;Database=Settlement;
+        Logging__LogLevel__Default: Information
+      jenkinsSecrets:
+      - credentialId: nexus-deploy-user
+        envVar: NEXUS_CREDENTIALS
+      - credentialId: settlement-db-password
+        envVar: SETTLEMENT_DB_PASSWORD
+    postHooks:
+    - id: warmup
+      script: .platform/scripts/warmup.ps1
+      runOn: serverGroup
+  undeploy: []
+full:
+  deployables:
+  - id: settlement-web
+    artifactId: sa.bank.channels:SettlementPortal
+    version: 3.4.1
+    packaging: dll
+    deployPath: C:/inetpub/settlement/web
+    serverGroup: web-tier
+    appPool: SettlementPortal
+    stage: deploy
+    deploymentStrategy: rolling
+    deploymentOrder: 10
+    dependsOn: []
+    timeout:
+      deploy: 300
+      healthCheck: 120
+    healthCheck:
+      enabled: true
+      endpoint: /health
+      port: 80
+      protocol: https
+      expectedStatus: 200
+      retries: 12
+      delaySeconds: 10
+    config:
+      environment:
+        ASPNETCORE_ENVIRONMENT: prod
+        ConnectionStrings__Default: Server=db-prod;Database=Settlement;
+        Logging__LogLevel__Default: Information
+      jenkinsSecrets:
+      - credentialId: nexus-deploy-user
+        envVar: NEXUS_CREDENTIALS
+      - credentialId: settlement-db-password
+        envVar: SETTLEMENT_DB_PASSWORD
+    postHooks:
+    - id: warmup
+      script: .platform/scripts/warmup.ps1
+      runOn: serverGroup
+  - id: settlement-api
+    artifactId: sa.bank.channels:SettlementApi
+    version: 3.4.1
+    packaging: dll
+    deployPath: C:/inetpub/settlement/api
+    serverGroup: api-tier
+    appPool: SettlementApi
+    stage: deploy
+    deploymentStrategy: rolling
+    deploymentOrder: 20
+    dependsOn:
+    - settlement-web
+    timeout:
+      deploy: 300
+      healthCheck: 120
+    healthCheck:
+      enabled: true
+      endpoint: /health
+      port: 8081
+      protocol: https
+      expectedStatus: 200
+      retries: 12
+      delaySeconds: 10
+    config:
+      environment:
+        ASPNETCORE_ENVIRONMENT: prod
+        ConnectionStrings__Default: Server=db-prod;Database=Settlement;
+        Logging__LogLevel__Default: Information
+      jenkinsSecrets:
+      - credentialId: nexus-deploy-user
+        envVar: NEXUS_CREDENTIALS
+      - credentialId: settlement-db-password
+        envVar: SETTLEMENT_DB_PASSWORD
+    postHooks:
+    - id: warmup
+      script: .platform/scripts/warmup.ps1
+      runOn: serverGroup
+
+# How the deployment ledger is persisted so rollback/audit survive workspace cleanup.
+stateTracking:
+  mode: git            # archive | git | workspace
+  branch: deployment-state
+  credentialsId: gitlab-deploy-token

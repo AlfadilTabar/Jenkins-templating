@@ -1,0 +1,160 @@
+---
+# =============================================================================
+# deploy-java-weblogic.yml  -  Robust Oracle WebLogic deployment (WAR/EAR)
+# -----------------------------------------------------------------------------
+# Consumes a single deployable passed as JSON extra-vars:  -e @deploy-vars.json
+#   deployable:            the full manifest entry. WebLogic-specific settings
+#                          live under deployable.weblogic:
+#                            adminUrl        t3://admin-host:7001   (required)
+#                            targets         "Cluster-Payments"     (required)
+#                            deploymentName  logical app name (default: ctx name)
+#                            stageMode       nostage|stage|external_stage (default nostage)
+#                            wlHome          $WL_HOME (default /opt/oracle/wlserver)
+#                          Admin credentials come from Jenkins-credential secrets
+#                          exposed as env vars (default WL_USERNAME / WL_PASSWORD).
+#   artifact_local:        path on the Jenkins agent to the fetched artifact (BODM)
+#   target_limit:          host or group to run against (the box(es) with the
+#                          WebLogic domain + weblogic.Deployer available)
+#   serial_spec:           1 (rolling) | "100%" (all-at-once) | [1,"100%"] (canary)
+#
+# Design (identical safety model to the Tomcat/JBoss playbooks):
+#   * Production Redeployment is done via weblogic.Deployer -redeploy so the app
+#     is replaced atomically on the WebLogic targets.
+#   * every host backs up the current source artifact BEFORE the swap.
+#   * block/rescue: if health/redeploy fails, the SAME host restores its backup
+#     source and re-redeploys it, then fails the play so a rolling/canary batch
+#     stops before spreading the bad version.
+#   * canary falls out naturally from serial_spec=[1,"100%"].
+#
+# NOTE: deploying to a WebLogic *Cluster* means one host runs the Deployer and
+#       WebLogic pushes to all cluster members. Set targetServers to a SINGLE
+#       admin-capable host in that case; use serverGroup/rolling only when each
+#       host owns an independent domain/target.
+# =============================================================================
+- name: Deploy Java artifact to WebLogic
+  hosts: "{{ target_limit }}"
+  serial: "{{ serial_spec | default(1) }}"
+  become: true
+  max_fail_percentage: 0
+  vars:
+    d: "{{ deployable }}"
+    wl: "{{ deployable.weblogic | default({}) }}"
+    wl_home: "{{ (deployable.weblogic | default({})).wlHome | default('/opt/oracle/wlserver') }}"
+    admin_url: "{{ (deployable.weblogic | default({})).adminUrl }}"
+    wl_targets: "{{ (deployable.weblogic | default({})).targets }}"
+    stage_mode: "{{ (deployable.weblogic | default({})).stageMode | default('nostage') }}"
+    dep_name: "{{ (deployable.weblogic | default({})).deploymentName | default(deployable.deployPath | basename | regex_replace('\\.(war|ear)$','')) }}"
+    src_dest: >-
+      {{ deployable.deployPath if deployable.deployPath.endswith('.' ~ (deployable.packaging | default('war')))
+         else deployable.deployPath ~ '.' ~ (deployable.packaging | default('war')) }}
+    backup_root: "/var/backups/weblogic/{{ deployable.id }}"
+    ts: "{{ ansible_date_time.iso8601_basic_short }}"
+    # Admin credentials: pulled from environment (Jenkins-credential secrets).
+    wl_user: "{{ lookup('env', (deployable.weblogic | default({})).userEnv | default('WL_USERNAME')) }}"
+    wl_pass: "{{ lookup('env', (deployable.weblogic | default({})).passEnv | default('WL_PASSWORD')) }}"
+    deployer: ". {{ wl_home }}/server/bin/setWLSEnv.sh >/dev/null 2>&1 && java weblogic.Deployer -adminurl {{ admin_url }} -username '{{ wl_user }}' -password '{{ wl_pass }}'"
+
+  tasks:
+    - name: "[{{ d.id }}] Preflight - required WebLogic settings present"
+      ansible.builtin.assert:
+        that:
+          - admin_url is truthy
+          - wl_targets is truthy
+          - wl_user is truthy
+          - wl_pass is truthy
+        fail_msg: >-
+          weblogic.adminUrl, weblogic.targets and admin credentials (WL_USERNAME/
+          WL_PASSWORD via jenkinsSecrets) are required for {{ d.id }}.
+
+    - name: "[{{ d.id }}] Ensure backup + staging directories exist"
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0750"
+      loop:
+        - "{{ backup_root }}"
+        - "{{ src_dest | dirname }}"
+
+    - name: "[{{ d.id }}] Back up currently deployed source for rollback"
+      ansible.builtin.copy:
+        src: "{{ src_dest }}"
+        dest: "{{ backup_root }}/{{ dep_name }}-{{ ts }}.{{ d.packaging | default('war') }}"
+        remote_src: true
+      failed_when: false            # first deploy has nothing to back up
+      register: backup_step
+
+    - name: "[{{ d.id }}] Prune old backups (keep newest {{ (deployable.weblogic | default({})).keepBackups | default(5) }})"
+      ansible.builtin.shell: >-
+        ls -1t "{{ backup_root }}"/*.{{ d.packaging | default('war') }} 2>/dev/null
+        | tail -n +{{ ((deployable.weblogic | default({})).keepBackups | default(5)) + 1 }}
+        | xargs -r rm -f
+      changed_when: false
+
+    - name: "[{{ d.id }}] Check whether the application is already deployed"
+      ansible.builtin.shell: "{{ deployer }} -listapps 2>/dev/null | grep -qw '{{ dep_name }}'"
+      register: app_exists
+      changed_when: false
+      failed_when: false
+      no_log: true
+
+    - name: "[{{ d.id }}] Deploy block (upload source + (re)deploy + health)"
+      block:
+        - name: "[{{ d.id }}] Place application config files"
+          ansible.builtin.copy:
+            src: "{{ item.source }}"
+            dest: "{{ item.destination }}"
+            mode: "{{ item.mode | default('0644') }}"
+          loop: "{{ d.config.files | default([]) }}"
+          loop_control: { label: "{{ item.destination }}" }
+
+        - name: "[{{ d.id }}] Copy new artifact from agent to server"
+          ansible.builtin.copy:
+            src: "{{ artifact_local }}"
+            dest: "{{ src_dest }}"
+            mode: "0644"
+
+        - name: "[{{ d.id }}] Redeploy existing application ({{ dep_name }})"
+          ansible.builtin.shell: >-
+            {{ deployer }} -redeploy -name '{{ dep_name }}'
+            -source '{{ src_dest }}' -targets '{{ wl_targets }}' -{{ stage_mode }}
+          register: wl_redeploy
+          when: app_exists.rc == 0
+          no_log: true
+
+        - name: "[{{ d.id }}] First-time deploy application ({{ dep_name }})"
+          ansible.builtin.shell: >-
+            {{ deployer }} -deploy -name '{{ dep_name }}'
+            -source '{{ src_dest }}' -targets '{{ wl_targets }}' -{{ stage_mode }} -upload
+          register: wl_deploy
+          when: app_exists.rc != 0
+          no_log: true
+
+        - name: "[{{ d.id }}] Wait for application health"
+          ansible.builtin.uri:
+            url: "{{ (d.healthCheck.protocol | default('http')) }}://{{ inventory_hostname }}:{{ d.healthCheck.port | default(7001) }}{{ d.healthCheck.endpoint }}"
+            status_code: "{{ d.healthCheck.expectedStatus | default(200) }}"
+            validate_certs: false
+          register: health
+          retries: "{{ d.healthCheck.retries | default(12) }}"
+          delay: "{{ d.healthCheck.delaySeconds | default(10) }}"
+          until: health.status == (d.healthCheck.expectedStatus | default(200))
+          when: (d.healthCheck.enabled | default(true))
+
+      rescue:
+        - name: "[{{ d.id }}] REDEPLOY/HEALTH FAILED on {{ inventory_hostname }} - restoring previous source"
+          ansible.builtin.copy:
+            src: "{{ backup_step.dest }}"
+            dest: "{{ src_dest }}"
+            remote_src: true
+          when: backup_step is succeeded and backup_step.dest is defined
+
+        - name: "[{{ d.id }}] Re-redeploy the restored previous source"
+          ansible.builtin.shell: >-
+            {{ deployer }} -redeploy -name '{{ dep_name }}'
+            -source '{{ src_dest }}' -targets '{{ wl_targets }}' -{{ stage_mode }}
+          when: backup_step is succeeded and backup_step.dest is defined
+          no_log: true
+
+        - name: "[{{ d.id }}] Fail the play so the rollout stops"
+          ansible.builtin.fail:
+            msg: "Deployment of {{ d.id }} {{ d.version }} failed on {{ inventory_hostname }}; previous source restored."

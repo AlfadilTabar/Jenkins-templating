@@ -1,0 +1,39 @@
+apiVersion: platform/v1
+kind: Profile
+metadata:
+  name: python-systemd-linux
+  description: >-
+    Python application (wheels/sdists) installed into a virtualenv and run as a
+    systemd service on Linux via Ansible. Build-Once-Deploy-Many on the wheel.
+  maintainer: platform-engineering
+  os: linux
+  executor: ansible
+agent: linux-deploy
+stages:
+  - id: checkout
+    label: "Checkout & Load Manifest"
+    step: platformCheckout
+  - id: fetch
+    label: "Fetch Artifacts from Nexus"
+    step: platformFetch
+  - id: validate
+    label: "Validate Checksums & Manifest"
+    step: platformValidate
+    locked: true
+  - id: approval
+    label: "Deployment Approval"
+    step: platformApproval
+    gatedEnvs: [uat, prod]
+    locked: true
+  - id: deploy
+    label: "Deploy systemd Service"
+    step: platformDeploy
+    playbook: steps/ansible/deploy-python-systemd.yml
+    strategy: rolling
+    locked: true
+  - id: smokeTest
+    label: "Smoke Test"
+    step: platformSmokeTest
+rollback:
+  onFailure: true
+  step: platformRollback

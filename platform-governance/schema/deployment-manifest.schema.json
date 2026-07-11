@@ -1,0 +1,150 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DeploymentManifest",
+  "description": "Per-environment RUNTIME manifest (deploy/<env>.yaml). Dual mode: 'targeted' (deploy/undeploy specific deployables) and 'full' (complete environment for recovery). Read by platformDeploy at runtime; never by the generator.",
+  "type": "object",
+  "required": ["apiVersion", "kind", "metadata", "inventory"],
+  "properties": {
+    "apiVersion": { "const": "platform/v1" },
+    "kind": { "const": "DeploymentManifest" },
+    "metadata": {
+      "type": "object",
+      "required": ["environment"],
+      "properties": {
+        "environment": { "type": "string" },
+        "description": { "type": "string" },
+        "lastDeployed": { "type": "string" },
+        "lastDeployedBy": { "type": "string" },
+        "lastGoodVersion": { "type": "string" }
+      }
+    },
+    "inventory": { "type": "string" },
+    "targeted": {
+      "type": "object",
+      "properties": {
+        "deploy":   { "type": "array", "items": { "$ref": "#/$defs/deployable" } },
+        "undeploy": { "type": "array", "items": { "$ref": "#/$defs/undeployItem" } }
+      }
+    },
+    "full": {
+      "type": "object",
+      "properties": {
+        "deployables": { "type": "array", "items": { "$ref": "#/$defs/deployable" } }
+      }
+    },
+    "stateTracking": {
+      "type": "object",
+      "description": "How the deployment ledger (.deploy-state) is persisted so rollback/audit survive workspace cleanup.",
+      "properties": {
+        "mode": { "enum": ["archive", "git", "workspace"], "description": "archive=fingerprinted build artifacts (default); git=commit to a state branch; workspace=no persistence" },
+        "branch": { "type": "string", "description": "git mode: branch to hold the ledger (default deployment-state)" },
+        "credentialsId": { "type": "string", "description": "git mode: Jenkins cred for pushing the ledger" },
+        "fromJob": { "type": "string", "description": "archive mode: deploy job to copy the ledger from during rollback" }
+      }
+    }
+  },
+  "$defs": {
+    "undeployItem": {
+      "type": "object",
+      "required": ["id", "deployPath"],
+      "properties": {
+        "id": { "type": "string" },
+        "deployPath": { "type": "string" },
+        "serverGroup": { "type": "string" },
+        "packaging": { "enum": ["jar", "war", "ear", "whl", "dll", "exe"] }
+      }
+    },
+    "deployable": {
+      "type": "object",
+      "required": ["id", "artifactId", "version", "deployPath"],
+      "properties": {
+        "id": { "type": "string" },
+        "artifactId": { "type": "string", "description": "group:name" },
+        "version": { "type": "string" },
+        "packaging": { "enum": ["jar", "war", "ear", "whl", "dll", "exe"] },
+        "deployPath": { "type": "string", "description": "Where on the server the artifact is placed" },
+        "serverGroup": { "type": "string" },
+        "targetServers": { "type": "array", "items": { "type": "string" }, "description": "Override serverGroup: deploy only to these hosts" },
+        "stage": { "type": "string", "description": "Pipeline stage id this deployable runs in (default 'deploy')" },
+        "deploymentStrategy": { "enum": ["rolling", "all-at-once", "blue-green", "canary"] },
+        "deploymentOrder": { "type": "integer", "description": "Lower runs earlier (default 100)" },
+        "dependsOn": { "type": "array", "items": { "type": "string" }, "description": "deployable ids that must go first" },
+        "timeout": {
+          "type": "object",
+          "properties": { "deploy": { "type": "integer" }, "healthCheck": { "type": "integer" } }
+        },
+        "healthCheck": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "endpoint": { "type": "string" },
+            "port": { "type": "integer" },
+            "protocol": { "enum": ["http", "https"] },
+            "expectedStatus": { "type": "integer" },
+            "retries": { "type": "integer" },
+            "delaySeconds": { "type": "integer" }
+          }
+        },
+        "config": {
+          "type": "object",
+          "properties": {
+            "environment": { "type": "object", "additionalProperties": { "type": "string" } },
+            "files": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["source", "destination"],
+                "properties": {
+                  "source": { "type": "string" },
+                  "destination": { "type": "string" },
+                  "mode": { "type": "string" }
+                }
+              }
+            },
+            "jenkinsSecrets": {
+              "type": "array",
+              "description": "Jenkins credentials injected as env vars (no external vault).",
+              "items": {
+                "type": "object",
+                "required": ["credentialId", "envVar"],
+                "properties": {
+                  "credentialId": { "type": "string" },
+                  "envVar": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "preHooks":  { "$ref": "#/$defs/hookList" },
+        "postHooks": { "$ref": "#/$defs/hookList" },
+        "weblogic": {
+          "type": "object",
+          "description": "WebLogic-specific settings (type java-weblogic-linux). Admin credentials come from config.jenkinsSecrets exposed as env vars.",
+          "properties": {
+            "adminUrl": { "type": "string", "description": "t3://admin-host:7001" },
+            "targets": { "type": "string", "description": "WebLogic target(s): a Managed Server or Cluster name" },
+            "deploymentName": { "type": "string", "description": "Logical app name (default: derived from deployPath)" },
+            "stageMode": { "enum": ["nostage", "stage", "external_stage"] },
+            "wlHome": { "type": "string" },
+            "keepBackups": { "type": "integer" },
+            "userEnv": { "type": "string", "description": "env var holding the admin user (default WL_USERNAME)" },
+            "passEnv": { "type": "string", "description": "env var holding the admin password (default WL_PASSWORD)" }
+          }
+        }
+      }
+    },
+    "hookList": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "script": { "type": "string" },
+          "playbook": { "type": "string" },
+          "runOn": { "type": "string", "pattern": "^(local|serverGroup|allServers|specificServer:.+)$" },
+          "timeout": { "type": "integer" }
+        }
+      }
+    }
+  }
+}

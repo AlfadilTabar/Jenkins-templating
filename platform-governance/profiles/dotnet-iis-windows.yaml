@@ -1,0 +1,39 @@
+apiVersion: platform/v1
+kind: Profile
+metadata:
+  name: dotnet-iis-windows
+  description: >-
+    .NET application (DLL/EXE) deployed to IIS on Windows via WinRM using the
+    PowerShell executor - demonstrates the stage sequence is executor-agnostic.
+  maintainer: platform-engineering
+  os: windows
+  executor: powershell
+agent: windows-deploy
+stages:
+  - id: checkout
+    label: "Checkout & Load Manifest"
+    step: platformCheckout
+  - id: fetch
+    label: "Fetch Artifacts from Nexus"
+    step: platformFetch
+  - id: validate
+    label: "Validate Checksums & Manifest"
+    step: platformValidate
+    locked: true
+  - id: approval
+    label: "Deployment Approval"
+    step: platformApproval
+    gatedEnvs: [uat, prod]
+    locked: true
+  - id: deploy
+    label: "Deploy to IIS"
+    step: platformDeploy
+    script: steps/powershell/deploy-iis.ps1
+    strategy: all-at-once
+    locked: true
+  - id: smokeTest
+    label: "Smoke Test"
+    step: platformSmokeTest
+rollback:
+  onFailure: true
+  step: platformRollback
