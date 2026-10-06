@@ -1,0 +1,26 @@
+I've taken "stress scenarios" as threat scenarios. If you meant load or availability stress, tell me and I'll redo it. These are the threats the design mitigates, and what in the design does it:
+
+**Access and credentials**
+- **Stolen developer credentials (NSA/CISA scenario 1).** An attacker with a developer's Git token can't reach UAT or PROD directly. Push protection, LDAP-backed access and per-pipeline least privilege limit what that token can do.
+- **Leaked secrets in code or pipelines.** Secrets detection blocks them at commit. Central secrets management injects short-lived credentials at runtime, so there's little to steal. Production secrets are isolated from non-production.
+
+**Supply chain**
+- **Malicious or vulnerable dependency or base image (scenario 2).** SCA and image scanning gate the build. Content enters only through the proxy from trusted sources, never directly from the internet.
+- **Compromised pipeline injecting code or changing config (scenario 3).** Production pulls only signed, scanned images, and releases promote the certified UAT image with no rebuild. A tampered build is caught before it's promoted.
+- **Poisoned pipeline execution.** Centralized pipeline templates, separation of duties and audit logs make unauthorized pipeline changes visible and traceable.
+
+**Lateral movement**
+- **UAT compromise spreading to PROD.** There is no direct UAT-to-PROD path. Only firewall-approved flows from the shared zone cross segment boundaries.
+- **Compromised production workload pivoting back.** Production has read-only pull access to the registry. It can't write artifacts or reach CI/CD or non-production.
+
+**Vulnerabilities**
+- **Vulnerable code reaching production.** SAST, SCA and DAST findings feed vulnerability management, and its quality gate blocks promotion on open critical or high findings.
+- **Newly disclosed CVE in running images or OS (a Log4Shell-type event).** Continuous rescans trigger automated rebuilds and patching. Patches go to the test ring first, then production.
+- **Security testing breaking production.** DAST and pentest automation only target UAT.
+
+**Resilience**
+- **HO site loss or ransomware.** The DR farm mirrors the zone, with repos, registry, secrets and the findings DB replicated.
+
+**What it doesn't mitigate on its own:** concentration risk. The shared zone holds deploy rights to every environment, so a compromise of the zone itself is the worst case. It needs its own controls on top of this design: PAM for admin access, MFA, EDR on the zone servers, SIEM monitoring of pipeline activity, and two-person approval for production releases.
+
+I can add this as a "Threat scenarios mitigated" section to the guidance document if you want it there.
