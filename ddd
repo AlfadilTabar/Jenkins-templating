@@ -1,0 +1,490 @@
+{
+  "version": "32.2.0",
+  "data": "<mxGraphModel dx=\"394\" dy=\"659\" grid=\"1\" gridSize=\"10\" guides=\"1\" tooltips=\"1\" connect=\"1\" arrows=\"1\" fold=\"1\" page=\"1\" pageScale=\"1\" pageWidth=\"850\" pageHeight=\"1100\" math=\"0\" shadow=\"0\"><root><mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/><mxCell id=\"2\" parent=\"1\" style=\"rounded=1;arcSize=2;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;dashed=1;dashPattern=8 5;verticalAlign=top;align=left;spacingLeft=10;spacingTop=4;fontStyle=1;fontSize=15;opacity=60;\" value=\"Dev / Test zone\" vertex=\"1\"><mxGeometry height=\"890\" width=\"320\" x=\"40\" y=\"40\" as=\"geometry\"/></mxCell><mxCell id=\"3\" parent=\"1\" style=\"rounded=1;arcSize=2;whiteSpace=wrap;html=1;fillColor=#f8f9fb;strokeColor=#4a6fa5;strokeWidth=2;dashed=1;dashPattern=8 5;verticalAlign=top;align=left;spacingLeft=10;spacingTop=4;fontStyle=1;fontSize=15;opacity=60;\" value=\"Shared DevOps and DevSecOps zone\" vertex=\"1\"><mxGeometry height=\"890\" width=\"980\" x=\"440\" y=\"40\" as=\"geometry\"/></mxCell><mxCell id=\"4\" parent=\"1\" style=\"rounded=1;arcSize=2;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=2;dashed=1;dashPattern=8 5;verticalAlign=top;align=left;spacingLeft=10;spacingTop=4;fontStyle=1;fontSize=15;opacity=60;\" value=\"Production zone\" vertex=\"1\"><mxGeometry height=\"890\" width=\"320\" x=\"1500\" y=\"40\" as=\"geometry\"/></mxCell><mxCell id=\"5\" edge=\"1\" parent=\"1\" style=\"endArrow=none;html=1;strokeColor=#b85450;strokeWidth=3;dashed=1;dashPattern=1 4;\"><mxGeometry relative=\"1\" as=\"geometry\"><mxPoint x=\"380\" y=\"30\" as=\"sourcePoint\"/><mxPoint x=\"380\" y=\"930\" as=\"targetPoint\"/></mxGeometry></mxCell><mxCell id=\"6\" parent=\"1\" style=\"rounded=1;whiteSpace=wrap;html=1;fillColor=#b85450;strokeColor=none;fontColor=#ffffff;fontStyle=1;fontSize=12;\" value=\"Firewall\" vertex=\"1\"><mxGeometry height=\"26\" width=\"64\" x=\"348\" y=\"4\" as=\"geometry\"/></mxCell><mxCell id=\"7\" edge=\"1\" parent=\"1\" style=\"endArrow=none;html=1;strokeColor=#b85450;strokeWidth=3;dashed=1;dashPattern=1 4;\"><mxGeometry relative=\"1\" as=\"geometry\"><mxPoint x=\"1460\" y=\"30\" as=\"sourcePoint\"/><mxPoint x=\"1460\" y=\"930\" as=\"targetPoint\"/></mxGeometry></mxCell><mxCell id=\"8\" parent=\"1\" style=\"rounded=1;whiteSpace=wrap;html=1;fillColor=#b85450;strokeColor=none;fontColor=#ffffff;fontStyle=1;fontSize=12;\" value=\"Firewall\" vertex=\"1\"><mxGeometry height=\"26\" width=\"64\" x=\"1428\" y=\"4\" as=\"geometry\"/></mxCell><mxCell id=\"9\" parent=\"1\" style=\"rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=1.5;fontSize=14;\" value=\"&lt;b&gt;Source control&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot; color=&quot;#555555&quot;&gt;Code repos, merge requests&lt;/font&gt;\" vertex=\"1\"><mxGeometry height=\"60\" width=\"170\" x=\"520\" y=\"140\" as=\"geometry\"/></mxCell><mxCell id=\"10\" parent=\"1\" style=\"rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1.5;fontSize=14;\" value=\"&lt;b&gt;Secrets management&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot; color=&quot;#555555&quot;&gt;Central secret store&lt;/font&gt;\" vertex=\"1\"><mxGeometry height=\"60\" width=\"170\" x=\"835\" y=\"140\" as=\"geometry\"/></mxCell><mxCell id=\"11\" parent=\"1\" style=\"rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=1.5;fontSize=14;\" value=\"&lt;b&gt;Artifact registry&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot; color=&quot;#555555&quot;&gt;Images and packages&lt;/font&gt;\" vertex=\"1\"><mxGeometry height=\"60\" width=\"170\" x=\"1150\" y=\"140\" as=\"geometry\"/></mxCell><mxCell id=\"12\" parent=\"1\" style=\"rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=1.5;fontSize=14;\" value=\"&lt;b&gt;CI/CD orchestration&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot; color=&quot;#555555&quot;&gt;Build, test, deploy pipelines (integration hub)&lt;/font&gt;\" vertex=\"1\"><mxGeometry height=\"60\" width=\"800\" x=\"520\" y=\"290\" as=\"geometry\"/></mxCell><mxCell id=\"13\" parent=\"1\" style=\"rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1.5;fontSize=14;\" value=\"&lt;b&gt;DAST&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot; color=&quot;#555555&quot;&gt;Runtime web testing&lt;/font&gt;\" vertex=\"1\"><mxGeometry height=\"60\" width=\"170\" x=\"520\" y=\"440\" as=\"geometry\"/></mxCell><mxCell id=\"14\" parent=\"1\" style=\"rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1.5;fontSize=14;\" value=\"&lt;b&gt;Secrets detection&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot; color=&quot;#555555&quot;&gt;Credential leak checks&lt;/font&gt;\" vertex=\"1\"><mxGeometry height=\"60\" width=\"170\" x=\"730\" y=\"440\" as=\"geometry\"/></mxCell><mxCell id=\"15\" parent=\"1\" style=\"rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1.5;fontSize=14;\" value=\"&lt;b&gt;SAST&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot; color=&quot;#555555&quot;&gt;Source code analysis&lt;/font&gt;\" vertex=\"1\"><mxGeometry height=\"60\" width=\"170\" x=\"940\" y=\"440\" as=\"geometry\"/></mxCell><mxCell id=\"16\" parent=\"1\" style=\"rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1.5;fontSize=14;\" value=\"&lt;b&gt;SCA&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot; color=&quot;#555555&quot;&gt;Dependency and license risk&lt;/font&gt;\" vertex=\"1\"><mxGeometry height=\"60\" width=\"170\" x=\"1150\" y=\"440\" as=\"geometry\"/></mxCell><mxCell id=\"17\" parent=\"1\" style=\"rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1.5;fontSize=14;\" value=\"&lt;b&gt;Vulnerability management&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot; color=&quot;#555555&quot;&gt;Aggregates, dedupes and triages all findings; owns SLAs and risk acceptance&lt;/font&gt;\" vertex=\"1\"><mxGeometry height=\"60\" width=\"800\" x=\"520\" y=\"590\" as=\"geometry\"/></mxCell><mxCell id=\"18\" parent=\"1\" style=\"rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;strokeWidth=1.5;fontSize=14;\" value=\"&lt;b&gt;Pentest automation&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot; color=&quot;#555555&quot;&gt;Scheduled exploit validation&lt;/font&gt;\" vertex=\"1\"><mxGeometry height=\"60\" width=\"170\" x=\"520\" y=\"740\" as=\"geometry\"/></mxCell><mxCell id=\"19\" parent=\"1\" style=\"rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;strokeWidth=1.5;fontSize=14;\" value=\"&lt;b&gt;Patch automation&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot; color=&quot;#555555&quot;&gt;OS and base image patching&lt;/font&gt;\" vertex=\"1\"><mxGeometry height=\"60\" width=\"170\" x=\"760\" y=\"740\" as=\"geometry\"/></mxCell><mxCell id=\"20\" parent=\"1\" style=\"rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1.5;fontSize=14;\" value=\"&lt;b&gt;Image scanning&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot; color=&quot;#555555&quot;&gt;Container CVEs and SBOM&lt;/font&gt;\" vertex=\"1\"><mxGeometry height=\"60\" width=\"170\" x=\"1020\" y=\"740\" as=\"geometry\"/></mxCell><mxCell id=\"21\" parent=\"1\" style=\"rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=1.5;fontSize=14;\" value=\"&lt;b&gt;Dev / Test container platform&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot; color=&quot;#555555&quot;&gt;Dev and UAT application workloads&lt;/font&gt;\" vertex=\"1\"><mxGeometry height=\"280\" width=\"240\" x=\"80\" y=\"260\" as=\"geometry\"/></mxCell><mxCell id=\"22\" parent=\"1\" style=\"rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=1.5;fontSize=14;\" value=\"&lt;b&gt;Dev / Test servers&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot; color=&quot;#555555&quot;&gt;OS fleet (patch test ring)&lt;/font&gt;\" vertex=\"1\"><mxGeometry height=\"180\" width=\"240\" x=\"80\" y=\"660\" as=\"geometry\"/></mxCell><mxCell id=\"23\" parent=\"1\" style=\"rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=1.5;fontSize=14;\" value=\"&lt;b&gt;Production container platform&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot; color=&quot;#555555&quot;&gt;Production application workloads&lt;/font&gt;\" vertex=\"1\"><mxGeometry height=\"280\" width=\"240\" x=\"1540\" y=\"260\" as=\"geometry\"/></mxCell><mxCell id=\"24\" parent=\"1\" style=\"rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=1.5;fontSize=14;\" value=\"&lt;b&gt;Production servers&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot; color=&quot;#555555&quot;&gt;OS fleet (production ring)&lt;/font&gt;\" vertex=\"1\"><mxGeometry height=\"180\" width=\"240\" x=\"1540\" y=\"660\" as=\"geometry\"/></mxCell><UserObject label=\"MR webhook\" tooltip=\"Merge request or merge event (webhook) triggers the pipeline\" id=\"25\"><mxCell edge=\"1\" parent=\"1\" source=\"9\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#333333;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#1f4e8c;labelBackgroundColor=#ffffff;labelBorderColor=#1f4e8c;spacing=2;exitX=0.5000;exitY=1.0000;exitDx=0;exitDy=0;entryX=0.1062;entryY=0.0000;entryDx=0;entryDy=0;\" target=\"12\"><mxGeometry relative=\"1\" as=\"geometry\"><mxPoint as=\"offset\"/></mxGeometry></mxCell></UserObject><UserObject label=\"Push protection\" tooltip=\"Push protection: pre-receive hook blocks commits that contain secrets\" id=\"26\"><mxCell edge=\"1\" parent=\"1\" source=\"9\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#333333;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#1f4e8c;labelBackgroundColor=#ffffff;labelBorderColor=#1f4e8c;spacing=2;exitX=0.0000;exitY=0.5000;exitDx=0;exitDy=0;entryX=0.1765;entryY=0.0000;entryDx=0;entryDy=0;\" target=\"14\"><mxGeometry relative=\"1\" x=\"-0.5902\" as=\"geometry\"><mxPoint as=\"offset\"/><Array as=\"points\"><mxPoint x=\"470\" y=\"170\"/><mxPoint x=\"470\" y=\"395\"/><mxPoint x=\"760\" y=\"395\"/></Array></mxGeometry></mxCell></UserObject><UserObject label=\"Pipeline credentials\" tooltip=\"Injects short-lived credentials into pipeline jobs, so no secrets live in code or job config\" id=\"27\"><mxCell edge=\"1\" parent=\"1\" source=\"10\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#333333;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#1f4e8c;labelBackgroundColor=#ffffff;labelBorderColor=#1f4e8c;spacing=2;exitX=0.5000;exitY=1.0000;exitDx=0;exitDy=0;entryX=0.5000;entryY=0.0000;entryDx=0;entryDy=0;\" target=\"12\"><mxGeometry relative=\"1\" as=\"geometry\"><mxPoint as=\"offset\"/></mxGeometry></mxCell></UserObject><UserObject label=\"Publish artifact\" tooltip=\"Publishes the built image or package once (build once, deploy many)\" id=\"28\"><mxCell edge=\"1\" parent=\"1\" source=\"12\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#333333;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#1f4e8c;labelBackgroundColor=#ffffff;labelBorderColor=#1f4e8c;spacing=2;exitX=0.8562;exitY=0.0000;exitDx=0;exitDy=0;entryX=0.3235;entryY=1.0000;entryDx=0;entryDy=0;\" target=\"11\"><mxGeometry relative=\"1\" as=\"geometry\"><mxPoint as=\"offset\"/></mxGeometry></mxCell></UserObject><UserObject label=\"Trigger DAST\" tooltip=\"Triggers an authenticated DAST scan after the build is deployed to test\" id=\"29\"><mxCell edge=\"1\" parent=\"1\" source=\"12\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#333333;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#1f4e8c;labelBackgroundColor=#ffffff;labelBorderColor=#1f4e8c;spacing=2;exitX=0.0688;exitY=1.0000;exitDx=0;exitDy=0;entryX=0.3235;entryY=0.0000;entryDx=0;entryDy=0;\" target=\"13\"><mxGeometry relative=\"1\" x=\"-0.5111\" as=\"geometry\"><mxPoint as=\"offset\"/></mxGeometry></mxCell></UserObject><UserObject label=\"Secret scan\" tooltip=\"Scans every change for hard-coded credentials and tokens\" id=\"30\"><mxCell edge=\"1\" parent=\"1\" source=\"12\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#333333;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#1f4e8c;labelBackgroundColor=#ffffff;labelBorderColor=#1f4e8c;spacing=2;exitX=0.3312;exitY=1.0000;exitDx=0;exitDy=0;entryX=0.3235;entryY=0.0000;entryDx=0;entryDy=0;\" target=\"14\"><mxGeometry relative=\"1\" x=\"-0.5111\" as=\"geometry\"><mxPoint as=\"offset\"/></mxGeometry></mxCell></UserObject><UserObject label=\"Code scan\" tooltip=\"Submits source code for static analysis and receives a pass/fail result\" id=\"31\"><mxCell edge=\"1\" parent=\"1\" source=\"12\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#333333;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#1f4e8c;labelBackgroundColor=#ffffff;labelBorderColor=#1f4e8c;spacing=2;exitX=0.5938;exitY=1.0000;exitDx=0;exitDy=0;entryX=0.3235;entryY=0.0000;entryDx=0;entryDy=0;\" target=\"15\"><mxGeometry relative=\"1\" x=\"-0.5111\" as=\"geometry\"><mxPoint as=\"offset\"/></mxGeometry></mxCell></UserObject><UserObject label=\"Dependency scan\" tooltip=\"Submits the dependency manifest and checks it against CVE and license policy\" id=\"32\"><mxCell edge=\"1\" parent=\"1\" source=\"12\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#333333;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#1f4e8c;labelBackgroundColor=#ffffff;labelBorderColor=#1f4e8c;spacing=2;exitX=0.8562;exitY=1.0000;exitDx=0;exitDy=0;entryX=0.3235;entryY=0.0000;entryDx=0;entryDy=0;\" target=\"16\"><mxGeometry relative=\"1\" x=\"-0.5111\" as=\"geometry\"><mxPoint as=\"offset\"/></mxGeometry></mxCell></UserObject><UserObject label=\"Runtime findings\" tooltip=\"Runtime findings (injection, auth and session flaws, misconfig) imported for triage\" id=\"33\"><mxCell edge=\"1\" parent=\"1\" source=\"13\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#333333;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#1f4e8c;labelBackgroundColor=#ffffff;labelBorderColor=#1f4e8c;spacing=2;exitX=0.6765;exitY=1.0000;exitDx=0;exitDy=0;entryX=0.1437;entryY=0.0000;entryDx=0;entryDy=0;\" target=\"17\"><mxGeometry relative=\"1\" as=\"geometry\"><mxPoint as=\"offset\"/></mxGeometry></mxCell></UserObject><UserObject label=\"Leak findings\" tooltip=\"Leaked-secret findings raised so the credential is revoked and rotated\" id=\"34\"><mxCell edge=\"1\" parent=\"1\" source=\"14\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#333333;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#1f4e8c;labelBackgroundColor=#ffffff;labelBorderColor=#1f4e8c;spacing=2;exitX=0.6765;exitY=1.0000;exitDx=0;exitDy=0;entryX=0.4062;entryY=0.0000;entryDx=0;entryDy=0;\" target=\"17\"><mxGeometry relative=\"1\" as=\"geometry\"><mxPoint as=\"offset\"/></mxGeometry></mxCell></UserObject><UserObject label=\"Code findings\" tooltip=\"Code weakness findings imported with CWE, severity and file location\" id=\"35\"><mxCell edge=\"1\" parent=\"1\" source=\"15\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#333333;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#1f4e8c;labelBackgroundColor=#ffffff;labelBorderColor=#1f4e8c;spacing=2;exitX=0.6765;exitY=1.0000;exitDx=0;exitDy=0;entryX=0.6687;entryY=0.0000;entryDx=0;entryDy=0;\" target=\"17\"><mxGeometry relative=\"1\" as=\"geometry\"><mxPoint as=\"offset\"/></mxGeometry></mxCell></UserObject><UserObject label=\"Dependency findings\" tooltip=\"Vulnerable or non-compliant component findings imported\" id=\"36\"><mxCell edge=\"1\" parent=\"1\" source=\"16\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#333333;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#1f4e8c;labelBackgroundColor=#ffffff;labelBorderColor=#1f4e8c;spacing=2;exitX=0.6765;exitY=1.0000;exitDx=0;exitDy=0;entryX=0.9313;entryY=0.0000;entryDx=0;entryDy=0;\" target=\"17\"><mxGeometry relative=\"1\" as=\"geometry\"><mxPoint as=\"offset\"/></mxGeometry></mxCell></UserObject><UserObject label=\"Quality gate\" tooltip=\"Quality gate decision: blocks promotion when critical/high findings are open without fix or risk acceptance\" id=\"37\"><mxCell edge=\"1\" parent=\"1\" source=\"17\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#333333;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#1f4e8c;labelBackgroundColor=#ffffff;labelBorderColor=#1f4e8c;spacing=2;exitX=1.0000;exitY=0.5000;exitDx=0;exitDy=0;entryX=1.0000;entryY=0.8333;entryDx=0;entryDy=0;\" target=\"12\"><mxGeometry relative=\"1\" x=\"0.4545\" as=\"geometry\"><mxPoint as=\"offset\"/><Array as=\"points\"><mxPoint x=\"1345\" y=\"620\"/><mxPoint x=\"1345\" y=\"340\"/></Array></mxGeometry></mxCell></UserObject><UserObject label=\"Exploit findings\" tooltip=\"Validated, exploitable findings reported with evidence\" id=\"38\"><mxCell edge=\"1\" parent=\"1\" source=\"18\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#333333;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#1f4e8c;labelBackgroundColor=#ffffff;labelBorderColor=#1f4e8c;spacing=2;exitX=0.5000;exitY=0.0000;exitDx=0;exitDy=0;entryX=0.1062;entryY=1.0000;entryDx=0;entryDy=0;\" target=\"17\"><mxGeometry relative=\"1\" as=\"geometry\"><mxPoint as=\"offset\"/></mxGeometry></mxCell></UserObject><UserObject label=\"Remediation / status\" tooltip=\"Remediation tickets drive patch jobs; patch completion status closes the findings\" id=\"39\"><mxCell edge=\"1\" parent=\"1\" source=\"17\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=block;startFill=1;strokeColor=#333333;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#1f4e8c;labelBackgroundColor=#ffffff;labelBorderColor=#1f4e8c;spacing=2;exitX=0.4062;exitY=1.0000;exitDx=0;exitDy=0;entryX=0.5000;entryY=0.0000;entryDx=0;entryDy=0;\" target=\"19\"><mxGeometry relative=\"1\" as=\"geometry\"><mxPoint as=\"offset\"/></mxGeometry></mxCell></UserObject><UserObject label=\"Image CVEs\" tooltip=\"Image CVEs and SBOM (software inventory) imported for triage\" id=\"40\"><mxCell edge=\"1\" parent=\"1\" source=\"20\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#333333;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#1f4e8c;labelBackgroundColor=#ffffff;labelBorderColor=#1f4e8c;spacing=2;exitX=0.5000;exitY=0.0000;exitDx=0;exitDy=0;entryX=0.7312;entryY=1.0000;entryDx=0;entryDy=0;\" target=\"17\"><mxGeometry relative=\"1\" as=\"geometry\"><mxPoint as=\"offset\"/></mxGeometry></mxCell></UserObject><UserObject label=\"New CVE\" tooltip=\"A new CVE in a base image or OS package triggers a patch / base-image rebuild job\" id=\"41\"><mxCell edge=\"1\" parent=\"1\" source=\"20\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#333333;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#1f4e8c;labelBackgroundColor=#ffffff;labelBorderColor=#1f4e8c;spacing=2;exitX=0.0000;exitY=0.5000;exitDx=0;exitDy=0;entryX=1.0000;entryY=0.5000;entryDx=0;entryDy=0;\" target=\"19\"><mxGeometry relative=\"1\" as=\"geometry\"><mxPoint as=\"offset\"/></mxGeometry></mxCell></UserObject><UserObject label=\"Scan images\" tooltip=\"Every pushed image is scanned; stored images are rescanned when new CVEs are published\" id=\"42\"><mxCell edge=\"1\" parent=\"1\" source=\"11\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#333333;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#1f4e8c;labelBackgroundColor=#ffffff;labelBorderColor=#1f4e8c;spacing=2;exitX=1.0000;exitY=0.5000;exitDx=0;exitDy=0;entryX=1.0000;entryY=0.7500;entryDx=0;entryDy=0;\" target=\"20\"><mxGeometry relative=\"1\" x=\"0.7721\" as=\"geometry\"><mxPoint as=\"offset\"/><Array as=\"points\"><mxPoint x=\"1395\" y=\"170\"/><mxPoint x=\"1395\" y=\"785\"/></Array></mxGeometry></mxCell></UserObject><UserObject label=\"Patched base image\" tooltip=\"Publishes the rebuilt, patched base image; dependent apps rebuild on top of it\" id=\"43\"><mxCell edge=\"1\" parent=\"1\" source=\"19\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#333333;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#1f4e8c;labelBackgroundColor=#ffffff;labelBorderColor=#1f4e8c;spacing=2;exitX=0.7647;exitY=1.0000;exitDx=0;exitDy=0;entryX=1.0000;entryY=0.2500;entryDx=0;entryDy=0;\" target=\"11\"><mxGeometry relative=\"1\" x=\"-0.5345\" as=\"geometry\"><mxPoint as=\"offset\"/><Array as=\"points\"><mxPoint x=\"890\" y=\"860\"/><mxPoint x=\"1410\" y=\"860\"/><mxPoint x=\"1410\" y=\"155\"/></Array></mxGeometry></mxCell></UserObject><UserObject label=\"Deploy (GitOps)\" tooltip=\"Deploys the build to dev, then UAT (GitOps sync of the certified image)\" id=\"44\"><mxCell edge=\"1\" parent=\"1\" source=\"12\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#b85450;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#b85450;labelBackgroundColor=#ffffff;labelBorderColor=#b85450;spacing=2;exitX=0.0000;exitY=0.6667;exitDx=0;exitDy=0;entryX=1.0000;entryY=0.2500;entryDx=0;entryDy=0;\" target=\"21\"><mxGeometry relative=\"1\" x=\"0.5\" as=\"geometry\"><mxPoint as=\"offset\"/></mxGeometry></mxCell></UserObject><UserObject label=\"Image pull\" tooltip=\"Dev / test cluster pulls images (read-only pull)\" id=\"45\"><mxCell edge=\"1\" parent=\"1\" source=\"11\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#b85450;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#b85450;labelBackgroundColor=#ffffff;labelBorderColor=#b85450;spacing=2;exitX=0.4706;exitY=0.0000;exitDx=0;exitDy=0;entryX=1.0000;entryY=0.0714;entryDx=0;entryDy=0;\" target=\"21\"><mxGeometry relative=\"1\" x=\"-0.1624\" as=\"geometry\"><mxPoint as=\"offset\"/><Array as=\"points\"><mxPoint x=\"1230\" y=\"80\"/><mxPoint x=\"395\" y=\"80\"/><mxPoint x=\"395\" y=\"280\"/></Array></mxGeometry></mxCell></UserObject><UserObject label=\"Test secrets\" tooltip=\"Runtime secret injection for test workloads (non-production secrets only)\" id=\"46\"><mxCell edge=\"1\" parent=\"1\" source=\"10\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#b85450;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#b85450;labelBackgroundColor=#ffffff;labelBorderColor=#b85450;spacing=2;exitX=0.2647;exitY=0.0000;exitDx=0;exitDy=0;entryX=1.0000;entryY=0.1429;entryDx=0;entryDy=0;\" target=\"21\"><mxGeometry relative=\"1\" x=\"-0.3377\" as=\"geometry\"><mxPoint as=\"offset\"/><Array as=\"points\"><mxPoint x=\"880\" y=\"115\"/><mxPoint x=\"410\" y=\"115\"/><mxPoint x=\"410\" y=\"300\"/></Array></mxGeometry></mxCell></UserObject><UserObject label=\"DAST scan\" tooltip=\"Scans running UAT applications over HTTPS; production is never a DAST target\" id=\"47\"><mxCell edge=\"1\" parent=\"1\" source=\"13\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#b85450;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#b85450;labelBackgroundColor=#ffffff;labelBorderColor=#b85450;spacing=2;exitX=0.0000;exitY=0.5000;exitDx=0;exitDy=0;entryX=1.0000;entryY=0.7500;entryDx=0;entryDy=0;\" target=\"21\"><mxGeometry relative=\"1\" x=\"0.5\" as=\"geometry\"><mxPoint as=\"offset\"/></mxGeometry></mxCell></UserObject><UserObject label=\"Pentest\" tooltip=\"Scheduled exploit validation against UAT applications and hosts\" id=\"48\"><mxCell edge=\"1\" parent=\"1\" source=\"18\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#b85450;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#b85450;labelBackgroundColor=#ffffff;labelBorderColor=#b85450;spacing=2;exitX=0.0000;exitY=0.5000;exitDx=0;exitDy=0;entryX=1.0000;entryY=0.6111;entryDx=0;entryDy=0;\" target=\"22\"><mxGeometry relative=\"1\" x=\"0.5\" as=\"geometry\"><mxPoint as=\"offset\"/></mxGeometry></mxCell></UserObject><UserObject label=\"Patch test ring\" tooltip=\"OS patches applied to the test ring first for validation\" id=\"49\"><mxCell edge=\"1\" parent=\"1\" source=\"19\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#b85450;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#b85450;labelBackgroundColor=#ffffff;labelBorderColor=#b85450;spacing=2;exitX=0.2353;exitY=1.0000;exitDx=0;exitDy=0;entryX=0.5000;entryY=1.0000;entryDx=0;entryDy=0;\" target=\"22\"><mxGeometry relative=\"1\" x=\"0.0556\" as=\"geometry\"><mxPoint as=\"offset\"/><Array as=\"points\"><mxPoint x=\"800\" y=\"880\"/><mxPoint x=\"200\" y=\"880\"/></Array></mxGeometry></mxCell></UserObject><UserObject label=\"Promote release\" tooltip=\"Promotes the certified UAT image after release approval (no rebuild)\" id=\"50\"><mxCell edge=\"1\" parent=\"1\" source=\"12\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#b85450;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#b85450;labelBackgroundColor=#ffffff;labelBorderColor=#b85450;spacing=2;exitX=1.0000;exitY=0.5000;exitDx=0;exitDy=0;entryX=0.0000;entryY=0.2143;entryDx=0;entryDy=0;\" target=\"23\"><mxGeometry relative=\"1\" x=\"-0.0909\" as=\"geometry\"><mxPoint as=\"offset\"/></mxGeometry></mxCell></UserObject><UserObject label=\"Signed image pull\" tooltip=\"Production cluster pulls only signed, scanned images\" id=\"51\"><mxCell edge=\"1\" parent=\"1\" source=\"11\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#b85450;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#b85450;labelBackgroundColor=#ffffff;labelBorderColor=#b85450;spacing=2;exitX=0.8235;exitY=0.0000;exitDx=0;exitDy=0;entryX=0.0000;entryY=0.1429;entryDx=0;entryDy=0;\" target=\"23\"><mxGeometry relative=\"1\" x=\"-0.4894\" as=\"geometry\"><mxPoint as=\"offset\"/><Array as=\"points\"><mxPoint x=\"1290\" y=\"110\"/><mxPoint x=\"1470\" y=\"110\"/><mxPoint x=\"1470\" y=\"300\"/></Array></mxGeometry></mxCell></UserObject><UserObject label=\"Prod secrets\" tooltip=\"Runtime secret injection; production secrets isolated from non-production\" id=\"52\"><mxCell edge=\"1\" parent=\"1\" source=\"10\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#b85450;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#b85450;labelBackgroundColor=#ffffff;labelBorderColor=#b85450;spacing=2;exitX=0.6765;exitY=0.0000;exitDx=0;exitDy=0;entryX=0.0000;entryY=0.0714;entryDx=0;entryDy=0;\" target=\"23\"><mxGeometry relative=\"1\" x=\"-0.5244\" as=\"geometry\"><mxPoint as=\"offset\"/><Array as=\"points\"><mxPoint x=\"950\" y=\"95\"/><mxPoint x=\"1485\" y=\"95\"/><mxPoint x=\"1485\" y=\"280\"/></Array></mxGeometry></mxCell></UserObject><UserObject label=\"Patch prod ring\" tooltip=\"Rolls out patches validated in the test ring during the approved change window\" id=\"53\"><mxCell edge=\"1\" parent=\"1\" source=\"19\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;startArrow=none;strokeColor=#b85450;strokeWidth=1.4;jumpStyle=arc;jumpSize=8;fontSize=11;fontStyle=1;fontColor=#b85450;labelBackgroundColor=#ffffff;labelBorderColor=#b85450;spacing=2;exitX=0.4706;exitY=1.0000;exitDx=0;exitDy=0;entryX=0.5000;entryY=1.0000;entryDx=0;entryDy=0;\" target=\"24\"><mxGeometry relative=\"1\" x=\"0.0408\" as=\"geometry\"><mxPoint as=\"offset\"/><Array as=\"points\"><mxPoint x=\"840\" y=\"900\"/><mxPoint x=\"1660\" y=\"900\"/></Array></mxGeometry></mxCell></UserObject><mxCell id=\"54\" parent=\"1\" style=\"text;html=1;align=left;verticalAlign=middle;fontSize=12;\" value=\"&lt;b&gt;Legend:&lt;/b&gt; &amp;nbsp; &lt;span style=&quot;background:#dae8fc;border:1px solid #6c8ebf&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt; DevOps capability &amp;nbsp; &lt;span style=&quot;background:#d5e8d4;border:1px solid #82b366&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt; Security capability &amp;nbsp; &lt;span style=&quot;background:#ffe6cc;border:1px solid #d79b00&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt; Security automation &amp;nbsp; &lt;span style=&quot;background:#e1d5e7;border:1px solid #9673a6&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt; Findings hub &amp;nbsp; &lt;span style=&quot;background:#f5f5f5;border:1px solid #666&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt; Environment / server farm &amp;nbsp; &lt;font color=&quot;#333333&quot;&gt;━━&lt;/font&gt; Integration inside shared zone &amp;nbsp; &lt;font color=&quot;#b85450&quot;&gt;━━&lt;/font&gt; Cross-zone communication (through firewall)\" vertex=\"1\"><mxGeometry height=\"26\" width=\"1780\" x=\"40\" y=\"944\" as=\"geometry\"/></mxCell></root></mxGraphModel>",
+  "pages": [
+    {
+      "id": "3NKkkURJjE1_pvEKmCU7",
+      "name": "DevSecOps architecture",
+      "cells": [
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-1",
+          "type": "node",
+          "parent": "1",
+          "label": "Dev / Test zone"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-2",
+          "type": "node",
+          "parent": "1",
+          "label": "Shared DevOps and DevSecOps zone"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-3",
+          "type": "node",
+          "parent": "1",
+          "label": "Production zone"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-4",
+          "type": "edge",
+          "parent": "1"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-5",
+          "type": "node",
+          "parent": "1",
+          "label": "Firewall"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-6",
+          "type": "edge",
+          "parent": "1"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-7",
+          "type": "node",
+          "parent": "1",
+          "label": "Firewall"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-8",
+          "type": "node",
+          "parent": "1",
+          "label": "Source control\nCode repos, merge requests",
+          "html": "<b>Source control</b><br><font style=\"font-size:11px\" color=\"#555555\">Code repos, merge requests</font>"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-9",
+          "type": "node",
+          "parent": "1",
+          "label": "Secrets management\nCentral secret store",
+          "html": "<b>Secrets management</b><br><font style=\"font-size:11px\" color=\"#555555\">Central secret store</font>"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-10",
+          "type": "node",
+          "parent": "1",
+          "label": "Artifact registry\nImages and packages",
+          "html": "<b>Artifact registry</b><br><font style=\"font-size:11px\" color=\"#555555\">Images and packages</font>"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-11",
+          "type": "node",
+          "parent": "1",
+          "label": "CI/CD orchestration\nBuild, test, deploy pipelines (integration hub)",
+          "html": "<b>CI/CD orchestration</b><br><font style=\"font-size:11px\" color=\"#555555\">Build, test, deploy pipelines (integration hub)</font>"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-12",
+          "type": "node",
+          "parent": "1",
+          "label": "DAST\nRuntime web testing",
+          "html": "<b>DAST</b><br><font style=\"font-size:11px\" color=\"#555555\">Runtime web testing</font>"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-13",
+          "type": "node",
+          "parent": "1",
+          "label": "Secrets detection\nCredential leak checks",
+          "html": "<b>Secrets detection</b><br><font style=\"font-size:11px\" color=\"#555555\">Credential leak checks</font>"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-14",
+          "type": "node",
+          "parent": "1",
+          "label": "SAST\nSource code analysis",
+          "html": "<b>SAST</b><br><font style=\"font-size:11px\" color=\"#555555\">Source code analysis</font>"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-15",
+          "type": "node",
+          "parent": "1",
+          "label": "SCA\nDependency and license risk",
+          "html": "<b>SCA</b><br><font style=\"font-size:11px\" color=\"#555555\">Dependency and license risk</font>"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-16",
+          "type": "node",
+          "parent": "1",
+          "label": "Vulnerability management\nAggregates, dedupes and triages all findings; owns SLAs and risk acceptance",
+          "html": "<b>Vulnerability management</b><br><font style=\"font-size:11px\" color=\"#555555\">Aggregates, dedupes and triages all findings; owns SLAs and risk acceptance</font>"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-17",
+          "type": "node",
+          "parent": "1",
+          "label": "Pentest automation\nScheduled exploit validation",
+          "html": "<b>Pentest automation</b><br><font style=\"font-size:11px\" color=\"#555555\">Scheduled exploit validation</font>"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-18",
+          "type": "node",
+          "parent": "1",
+          "label": "Patch automation\nOS and base image patching",
+          "html": "<b>Patch automation</b><br><font style=\"font-size:11px\" color=\"#555555\">OS and base image patching</font>"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-19",
+          "type": "node",
+          "parent": "1",
+          "label": "Image scanning\nContainer CVEs and SBOM",
+          "html": "<b>Image scanning</b><br><font style=\"font-size:11px\" color=\"#555555\">Container CVEs and SBOM</font>"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-20",
+          "type": "node",
+          "parent": "1",
+          "label": "Dev / Test container platform\nDev and UAT application workloads",
+          "html": "<b>Dev / Test container platform</b><br><font style=\"font-size:11px\" color=\"#555555\">Dev and UAT application workloads</font>"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-21",
+          "type": "node",
+          "parent": "1",
+          "label": "Dev / Test servers\nOS fleet (patch test ring)",
+          "html": "<b>Dev / Test servers</b><br><font style=\"font-size:11px\" color=\"#555555\">OS fleet (patch test ring)</font>"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-22",
+          "type": "node",
+          "parent": "1",
+          "label": "Production container platform\nProduction application workloads",
+          "html": "<b>Production container platform</b><br><font style=\"font-size:11px\" color=\"#555555\">Production application workloads</font>"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-23",
+          "type": "node",
+          "parent": "1",
+          "label": "Production servers\nOS fleet (production ring)",
+          "html": "<b>Production servers</b><br><font style=\"font-size:11px\" color=\"#555555\">OS fleet (production ring)</font>"
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-24",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-8",
+          "target": "jVoegrPgPHo1AE4sXaa4-11",
+          "label": "MR webhook",
+          "metadata": {
+            "tooltip": "Merge request or merge event (webhook) triggers the pipeline"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-25",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-8",
+          "target": "jVoegrPgPHo1AE4sXaa4-13",
+          "label": "Push protection",
+          "metadata": {
+            "tooltip": "Push protection: pre-receive hook blocks commits that contain secrets"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-26",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-9",
+          "target": "jVoegrPgPHo1AE4sXaa4-11",
+          "label": "Pipeline credentials",
+          "metadata": {
+            "tooltip": "Injects short-lived credentials into pipeline jobs, so no secrets live in code or job config"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-27",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-11",
+          "target": "jVoegrPgPHo1AE4sXaa4-10",
+          "label": "Publish artifact",
+          "metadata": {
+            "tooltip": "Publishes the built image or package once (build once, deploy many)"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-28",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-11",
+          "target": "jVoegrPgPHo1AE4sXaa4-12",
+          "label": "Trigger DAST",
+          "metadata": {
+            "tooltip": "Triggers an authenticated DAST scan after the build is deployed to test"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-29",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-11",
+          "target": "jVoegrPgPHo1AE4sXaa4-13",
+          "label": "Secret scan",
+          "metadata": {
+            "tooltip": "Scans every change for hard-coded credentials and tokens"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-30",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-11",
+          "target": "jVoegrPgPHo1AE4sXaa4-14",
+          "label": "Code scan",
+          "metadata": {
+            "tooltip": "Submits source code for static analysis and receives a pass/fail result"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-31",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-11",
+          "target": "jVoegrPgPHo1AE4sXaa4-15",
+          "label": "Dependency scan",
+          "metadata": {
+            "tooltip": "Submits the dependency manifest and checks it against CVE and license policy"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-32",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-12",
+          "target": "jVoegrPgPHo1AE4sXaa4-16",
+          "label": "Runtime findings",
+          "metadata": {
+            "tooltip": "Runtime findings (injection, auth and session flaws, misconfig) imported for triage"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-33",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-13",
+          "target": "jVoegrPgPHo1AE4sXaa4-16",
+          "label": "Leak findings",
+          "metadata": {
+            "tooltip": "Leaked-secret findings raised so the credential is revoked and rotated"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-34",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-14",
+          "target": "jVoegrPgPHo1AE4sXaa4-16",
+          "label": "Code findings",
+          "metadata": {
+            "tooltip": "Code weakness findings imported with CWE, severity and file location"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-35",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-15",
+          "target": "jVoegrPgPHo1AE4sXaa4-16",
+          "label": "Dependency findings",
+          "metadata": {
+            "tooltip": "Vulnerable or non-compliant component findings imported"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-36",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-16",
+          "target": "jVoegrPgPHo1AE4sXaa4-11",
+          "label": "Quality gate",
+          "metadata": {
+            "tooltip": "Quality gate decision: blocks promotion when critical/high findings are open without fix or risk acceptance"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-37",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-17",
+          "target": "jVoegrPgPHo1AE4sXaa4-16",
+          "label": "Exploit findings",
+          "metadata": {
+            "tooltip": "Validated, exploitable findings reported with evidence"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-38",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-16",
+          "target": "jVoegrPgPHo1AE4sXaa4-18",
+          "label": "Remediation / status",
+          "metadata": {
+            "tooltip": "Remediation tickets drive patch jobs; patch completion status closes the findings"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-39",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-19",
+          "target": "jVoegrPgPHo1AE4sXaa4-16",
+          "label": "Image CVEs",
+          "metadata": {
+            "tooltip": "Image CVEs and SBOM (software inventory) imported for triage"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-40",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-19",
+          "target": "jVoegrPgPHo1AE4sXaa4-18",
+          "label": "New CVE",
+          "metadata": {
+            "tooltip": "A new CVE in a base image or OS package triggers a patch / base-image rebuild job"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-41",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-10",
+          "target": "jVoegrPgPHo1AE4sXaa4-19",
+          "label": "Scan images",
+          "metadata": {
+            "tooltip": "Every pushed image is scanned; stored images are rescanned when new CVEs are published"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-42",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-18",
+          "target": "jVoegrPgPHo1AE4sXaa4-10",
+          "label": "Patched base image",
+          "metadata": {
+            "tooltip": "Publishes the rebuilt, patched base image; dependent apps rebuild on top of it"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-43",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-11",
+          "target": "jVoegrPgPHo1AE4sXaa4-20",
+          "label": "Deploy (GitOps)",
+          "metadata": {
+            "tooltip": "Deploys the build to dev, then UAT (GitOps sync of the certified image)"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-44",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-10",
+          "target": "jVoegrPgPHo1AE4sXaa4-20",
+          "label": "Image pull",
+          "metadata": {
+            "tooltip": "Dev / test cluster pulls images (read-only pull)"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-45",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-9",
+          "target": "jVoegrPgPHo1AE4sXaa4-20",
+          "label": "Test secrets",
+          "metadata": {
+            "tooltip": "Runtime secret injection for test workloads (non-production secrets only)"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-46",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-12",
+          "target": "jVoegrPgPHo1AE4sXaa4-20",
+          "label": "DAST scan",
+          "metadata": {
+            "tooltip": "Scans running UAT applications over HTTPS; production is never a DAST target"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-47",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-17",
+          "target": "jVoegrPgPHo1AE4sXaa4-21",
+          "label": "Pentest",
+          "metadata": {
+            "tooltip": "Scheduled exploit validation against UAT applications and hosts"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-48",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-18",
+          "target": "jVoegrPgPHo1AE4sXaa4-21",
+          "label": "Patch test ring",
+          "metadata": {
+            "tooltip": "OS patches applied to the test ring first for validation"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-49",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-11",
+          "target": "jVoegrPgPHo1AE4sXaa4-22",
+          "label": "Promote release",
+          "metadata": {
+            "tooltip": "Promotes the certified UAT image after release approval (no rebuild)"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-50",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-10",
+          "target": "jVoegrPgPHo1AE4sXaa4-22",
+          "label": "Signed image pull",
+          "metadata": {
+            "tooltip": "Production cluster pulls only signed, scanned images"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-51",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-9",
+          "target": "jVoegrPgPHo1AE4sXaa4-22",
+          "label": "Prod secrets",
+          "metadata": {
+            "tooltip": "Runtime secret injection; production secrets isolated from non-production"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-52",
+          "type": "edge",
+          "parent": "1",
+          "source": "jVoegrPgPHo1AE4sXaa4-18",
+          "target": "jVoegrPgPHo1AE4sXaa4-23",
+          "label": "Patch prod ring",
+          "metadata": {
+            "tooltip": "Rolls out patches validated in the test ring during the approved change window"
+          }
+        },
+        {
+          "id": "jVoegrPgPHo1AE4sXaa4-53",
+          "type": "node",
+          "parent": "1",
+          "label": "Legend:       DevOps capability       Security capability       Security automation       Findings hub       Environment / server farm   ━━ Integration inside shared zone   ━━ Cross-zone communication (through firewall)",
+          "html": "<b>Legend:</b> &nbsp; <span style=\"background:#dae8fc;border:1px solid #6c8ebf\">&nbsp;&nbsp;&nbsp;</span> DevOps capability &nbsp; <span style=\"background:#d5e8d4;border:1px solid #82b366\">&nbsp;&nbsp;&nbsp;</span> Security capability &nbsp; <span style=\"background:#ffe6cc;border:1px solid #d79b00\">&nbsp;&nbsp;&nbsp;</span> Security automation &nbsp; <span style=\"background:#e1d5e7;border:1px solid #9673a6\">&nbsp;&nbsp;&nbsp;</span> Findings hub &nbsp; <span style=\"background:#f5f5f5;border:1px solid #666\">&nbsp;&nbsp;&nbsp;</span> Environment / server farm &nbsp; <font color=\"#333333\">━━</font> Integration inside shared zone &nbsp; <font color=\"#b85450\">━━</font> Cross-zone communication (through firewall)"
+        }
+      ]
+    }
+  ]
+}
