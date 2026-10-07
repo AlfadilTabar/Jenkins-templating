@@ -1,0 +1,320 @@
+SRE and Manager of Managers Operating Model
+
+Roles, responsibilities, shared SRE practices, and service onboarding
+Date: 7 October 2026
+Status: Proposed organizational operating model
+
+1. Purpose and scope
+
+Establish a practical SRE operating model across business lines, service owners, SRE, application support, development or vendors, infrastructure teams, monitoring engineering, and command-center operators.
+
+The model assigns accountability for service outcomes, execution of reliability practices, operation of the monitoring environment, incident response, and acceptance of services into centralized monitoring.
+
+The confirmed operating arrangement is that command-center operators watch the monitoring screens. This document proposes that monitoring engineering builds and maintains the monitoring capability. That engineering responsibility can be assigned to an existing monitoring or platform team.
+
+Manager of managers (MoM) means the technology layer that consolidates alerts and service information from multiple monitoring tools. The actual product has not been specified. Splunk IT Service Intelligence (ITSI) is used only to illustrate documented capabilities; product-specific configuration must be adapted to the deployed platform and version.
+
+The organizational assignments, acceptance gates, and governance arrangements below are recommendations for this organization. Google SRE, ITIL, and Splunk documentation provide the underlying practices and capabilities; they do not prescribe this exact organizational chart.
+
+2. Operating principles
+
+1. One accountable service owner: each business service has a named owner with authority to coordinate priorities, funding, and risk decisions through established governance.
+2. Shared execution with explicit ownership: each activity has a lead, named contributors, and a measurable completion criterion.
+3. Business outcomes guide reliability: measure the user journeys that matter, such as completing a payment or receiving a timely inquiry response.
+4. Command center operates the monitoring view: operators detect, acknowledge, qualify, route, and track operational events.
+5. Monitoring engineering maintains the capability: engineers maintain integrations, service models, dashboards, rules, routing, and telemetry quality.
+6. Technical teams own their changes and recovery: application, infrastructure, database, network, development, and vendor teams retain responsibility for their components.
+7. SRE has an explicit engagement scope: specify supported services, engineering obligations, incident triggers, access, and coverage commitments.
+8. Service acceptance is evidence-based: require tested detection, routing, recovery, and ownership before accepting operational obligations.
+9. Protect engineering capacity: measure operational workload and reserve capacity for improvements that reduce recurring failures and manual work.
+
+Google’s engagement guidance supports agreeing service scope, shared goals, responsibilities, and sustainable levels of SRE involvement. 1, 2
+
+3. Roles and responsibilities
+
+|Team or role                                            |Actual responsibilities                                                                                                                                                                                         |Principal deliverables and decisions                                                                                      |
+|--------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+|**Business line**                                       |Identify critical journeys, business operating periods, impact of disruption, acceptable service performance, and future demand. Validate business recovery.                                                    |Business requirements, criticality, demand assumptions, and business validation criteria.                                 |
+|**Named service owner**                                 |Remain accountable for the end-to-end service. Agree objectives with business and technical teams, prioritize investment, resolve ownership conflicts, and obtain required risk acceptance.                     |Approved service objectives, prioritized improvement backlog, service acceptance, and documented risk decisions.          |
+|**SRE**                                                 |Design reliability measurement; analyze error budgets and systemic weaknesses; engineer automation; assess capacity and resilience; review readiness; implement assigned improvements; support agreed incidents.|SLI/SLO specifications, reliability reports, tested automation, engineering improvements, and readiness findings.         |
+|**Application support**                                 |Operate applications, investigate application incidents, execute approved recovery, coordinate vendors, maintain runbooks, validate transactions, and implement approved application changes.                   |Recovery evidence, operational procedures, application changes, known workarounds, and vendor follow-up.                  |
+|**Development / vendors**                               |Provide supported telemetry and diagnostic interfaces, diagnose defects, correct code, improve application behavior, test fixes, and disclose support constraints.                                              |Instrumentation, supported fixes, product documentation, test evidence, and defect-resolution commitments.                |
+|**Infrastructure / platform / database / network teams**|Operate and recover their components. Own configuration, patching, backups, component capacity, redundancy, and infrastructure improvements.                                                                    |Component recovery, change records, capacity evidence, and tested backup/restore or failover capabilities.                |
+|**Monitoring engineering**                              |Maintain monitoring tools and MoM integrations, service models, dashboards, rules, correlation, routing, and telemetry quality. Own configuration lifecycle and assign a named MoM platform owner.              |Working integrations, service-health views, actionable alerts, routing configuration, and monitoring-platform reliability.|
+|**Command-center operators**                            |Watch dashboards, acknowledge alerts, qualify impact, create/update incidents, engage resolvers, execute approved first-response procedures, track progress, and verify recovery signals.                       |Qualified incidents, accepted assignments, escalation records, shift handovers, and monitoring evidence.                  |
+|**Designated incident manager**                         |Coordinate major incidents, appoint response roles, manage communications, escalate delays or conflicts, and maintain the decision log. This role may sit within the command center.                            |Incident command, coordinated workstreams, stakeholder updates, and major-incident closure records.                       |
+|**ITSM practice / problem owner**                       |Maintain practice rules, assure record quality, coordinate problem investigation, track corrective actions, and verify closure criteria.                                                                        |Incident/problem governance, known-error records, action tracking, and evidence-based problem closure.                    |
+|**Change authority**                                    |Authorize changes according to risk, including standard and emergency paths defined by policy.                                                                                                                  |Change authorization and delegated execution conditions.                                                                  |
+|**Continuity / DR authority**                           |Govern continuity requirements, exercises, and DR invocation with service owners and technical teams.                                                                                                           |Approved recovery objectives, invocation decisions, exercise results, and remediation requirements.                       |
+
+The service owner and business representative may be the same person where authority and responsibilities are explicitly assigned. They do not need to be separate departments.
+
+During a major incident, appoint a technical lead in addition to the incident manager. The technical lead coordinates diagnosis and recovery across resolver teams. Google distinguishes incident command, communications, and operations roles. 3
+
+4. Distribution of SRE practices
+
+The following matrix assigns one accountable role for each defined activity. Contributors retain responsibility for completing their assigned work.
+
+|Practice / activity                                 |Accountable role                          |Execution across teams                                                                                                                       |Required evidence                                                                      |
+|----------------------------------------------------|------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+|**Approve service-level objectives**                |Service owner                             |Business identifies outcomes; SRE designs indicators and measurement; technical teams confirm feasibility.                                   |SLI/SLO specification: scope, calculation, target, window, data source, and exclusions.|
+|**Apply the error-budget policy**                   |Service owner                             |SRE reports consumption and causes; business and technical owners prioritize actions; engineering/vendors implement fixes.                   |Agreed decision policy, reliability report, and funded corrective actions.             |
+|**Implement SLI and error-budget measurement**      |SRE lead for an accepted engagement       |Monitoring implements data collection; application/infrastructure teams supply telemetry; SRE validates calculations.                        |Reproducible calculations, data-quality checks, and reviewed results.                  |
+|**Maintain monitoring and alert configuration**     |Monitoring engineering lead               |SRE advises on reliability signals; technical teams validate symptoms; command center supplies operational feedback.                         |Tested rules, dashboards, service mappings, routing, and runbooks.                     |
+|**Operate the alert queue**                         |Command-center shift lead                 |Operators acknowledge, qualify, route, escalate, and maintain handover.                                                                      |Accepted assignments, timely escalation, and complete operational records.             |
+|**Coordinate a major incident**                     |Designated incident manager               |Command center maintains coordination; technical leads direct recovery; SRE/vendors join as required.                                        |Response roles, decision log, communications, and recovery evidence.                   |
+|**Restore a failed component**                      |Affected technical domain owner           |Application support, infrastructure, development/vendor, or other resolver executes recovery within authority.                               |Validated recovery and recorded actions.                                               |
+|**Complete incident learning and problem follow-up**|Named problem owner                       |All responding teams contribute; SRE examines systemic issues; technical owners implement corrections.                                       |Blameless review, owned actions, verification, and justified closure.                  |
+|**Deliver SRE-owned automation**                    |SRE engineering lead                      |Operators identify toil; technical owners assist with implementation; operating teams validate usability.                                    |Tested automation, maintainer, operating procedure, and measured benefit.              |
+|**Plan service capacity and performance**           |Service owner                             |Business supplies demand; SRE coordinates service analysis; technical teams and vendors test limits and implement changes.                   |Demand model, bottleneck evidence, tested headroom, and investment decisions.          |
+|**Validate resilience and recovery**                |Continuity / DR authority for the exercise|SRE identifies failure scenarios; technical teams test; application support validates functionality; command center coordinates where needed.|Recovery results against approved objectives and owned remediation.                    |
+|**Authorize a production change**                   |Change authority                          |Implementing teams supply test and rollback evidence; SRE contributes reliability findings; monitoring observes results.                     |Authorization, rollback/stop criteria, and execution conditions.                       |
+|**Accept production readiness**                     |Service owner                             |SRE reviews reliability where engaged; every operating team proves its responsibilities are deliverable.                                     |Readiness assessment, operational acceptance, and documented residual risks.           |
+
+Where SRE is not engaged, explicitly assign measurement and reliability-engineering duties to a named technical owner. Central monitoring does not automatically establish SRE support obligations.
+
+Relevant Google guidance covers objectives and error budgets, monitoring, alerting, incident learning, toil reduction, and production readiness. 2, 4, 5, 6, 7, 8
+
+5. How the manager of managers supports the model
+
+5.1 Information and operational flow
+
+flowchart TD
+    T["Existing monitoring tools"] -->|Alerts| M["MoM: service context and correlation"]
+    T -->|Measurements| S["SLI and SLO calculations"]
+    S -->|Results and burn alerts| M
+    M --> C["Command center"]
+    C -->|Incident and evidence| R["Named technical resolver"]
+    R --> V["Recovery validation"]
+    V --> L["Review and engineering improvements"]
+    L -->|Improve signals and rules| T
+    L -->|Improve measurement| S
+
+SLI/SLO calculations can run in a source monitoring platform, a dedicated reliability service, or the MoM where its capabilities support the agreed calculation. Maintain one authoritative definition and link the operational views to it.
+
+5.2 Required MoM capabilities and ownership
+
+|Capability                       |Operational use                                                                                    |Proposed owner                                                                                                                 |
+|---------------------------------|---------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+|**Business-service model**       |Connect business services to applications, relevant components, and dependencies.                  |Monitoring engineering maintains configuration; application/infrastructure teams supply topology; service owner approves scope.|
+|**Event normalization**          |Map source alerts into consistent identity, severity, time, entity, and lifecycle fields.          |Monitoring engineering with source-tool owners.                                                                                |
+|**Correlation and deduplication**|Group related symptoms and reduce repeated work while retaining original evidence.                 |Monitoring engineering; resolver teams validate the grouping.                                                                  |
+|**Service-health views**         |Show affected journeys, service status, dependencies, and uncertainty caused by missing data.      |Monitoring engineering maintains; command center defines operational usability needs.                                          |
+|**Priority and routing**         |Combine impact, urgency, service criticality, resolver ownership, and support coverage.            |Service owner agrees business priority; monitoring configures; command center applies and escalates.                           |
+|**Reliability views**            |Display SLO results and error-budget information or link to the authoritative reports.             |SRE owns measurement design for engaged services; monitoring implements presentation/integration.                              |
+|**ITSM integration**             |Create/update incidents and preserve links among source events, MoM episodes, and incident records.|Monitoring/platform integration owner; ITSM owner defines record and lifecycle rules.                                          |
+|**Approved operational actions** |Invoke controlled diagnostics or recovery actions with recorded results.                           |Automation owner maintains the action; relevant authority defines execution permissions.                                       |
+|**Platform health**              |Detect ingestion lag, connector failure, stale dashboards, processing errors, and platform outage. |Named MoM platform owner.                                                                                                      |
+
+Splunk ITSI documents service-health visualization, third-party alert ingestion, event normalization, episode workflows, and aggregation policies. These are product capabilities that require configuration and operating ownership. 9, 10, 11, 12
+
+5.3 Distinguish health scores, service levels, and incidents
+
+|Record or measure                       |Meaning                                                                                                      |
+|----------------------------------------|-------------------------------------------------------------------------------------------------------------|
+|**Service-health score**                |A summary of configured KPI/component states and their weighting.                                            |
+|**SLI**                                 |A measurement of an agreed service outcome, such as successful transactions divided by eligible transactions.|
+|**SLO**                                 |A target for the SLI over an agreed measurement window.                                                      |
+|**Error budget**                        |The amount of failure allowed by the SLO over that window.                                                   |
+|**MoM episode / correlated event group**|Operationally related events grouped for investigation.                                                      |
+|**ITSM incident**                       |The authoritative restoration record in this proposed operating model.                                       |
+
+An ITSI health score is not automatically SLO attainment. Alert counts alone cannot establish a transaction-success SLI because they do not provide the full population of eligible transactions. 4, 13
+
+Detailed logs and traces can remain in existing tools, with drill-down links from the MoM. Choose the data required for operational visibility and measurement rather than duplicating every source dataset.
+
+Treat missing or stale telemetry as a distinct condition. Provide an independent notification route for MoM failure. Correlation suggests relationships for investigation; technical teams validate causes.
+
+6. Service onboarding process
+
+Onboarding is complete when the organization can detect, assign, investigate, recover, and verify a service issue using tested procedures.
+
+|Step                                       |Lead and contributors                                                          |Required completion evidence                                                                                                                                |
+|-------------------------------------------|-------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|**1. Register the service**                |Service owner, business, application support                                   |Service ID, business purpose, critical journeys, tier, operating hours, accountable owner, support groups, and vendor contacts.                             |
+|**2. Map dependencies**                    |Application support, development/vendor, infrastructure; monitoring configures |Relevant application components, database, network, messaging, identity, and external dependencies; maintained entity identifiers.                          |
+|**3. Define service health and indicators**|SRE with business and technical owners                                         |User-success and latency measures; correctness, freshness, or batch-completion measures where relevant; supporting component signals; missing-data behavior.|
+|**4. Connect monitoring sources**          |Monitoring engineering and source-tool owners                                  |Tested access, connectors, event delivery, measurement collection, timestamps, freshness, and diagnostic links.                                             |
+|**5. Normalize and correlate**             |Monitoring engineering with resolver teams                                     |Common event structure, identity, severity mapping, open/update/clear handling, deduplication, and validated correlation.                                   |
+|**6. Configure response**                  |Command center, monitoring, resolver teams, ITSM owner                         |Priority, assignment group, coverage, runbook, escalation path, ticket lifecycle, and maintenance handling.                                                 |
+|**7. Test end to end**                     |Monitoring, command center, application/infrastructure teams; SRE where engaged|Controlled fault produces the correct signal, reaches an available responder, creates/routes the incident, and supports validated recovery.                 |
+|**8. Accept service operations**           |Service owner; each operating team accepts its obligations                     |Acceptance record, residual risks, outstanding actions, named maintainers, and review triggers.                                                             |
+
+The integration and normalization steps align with Splunk’s documented third-party event-ingestion and event-analytics guidance. The role assignments and acceptance requirements are proposed organizational controls. 10, 14
+
+6.1 Minimum event and service context
+
+Define a common information contract, adapting field names to the deployed MoM. Some values may be added through service-catalog enrichment rather than supplied by the original alert.
+
+|Information                                                |Purpose                                                        |
+|-----------------------------------------------------------|---------------------------------------------------------------|
+|Source system and source event ID                          |Traceability, updates, and duplicate handling.                 |
+|Service ID, environment, entity/component ID               |Associate the event with the correct service and dependency.   |
+|Event type and summary                                     |Describe the condition and affected function.                  |
+|Original severity and normalized severity                  |Preserve source meaning while supporting consistent operations.|
+|State: open, updated, recovered/cleared                    |Maintain the event lifecycle correctly.                        |
+|Occurrence, update, and ingestion timestamps               |Evaluate event age, latency, and ordering.                     |
+|Stable deduplication key and correlation attributes        |Control repeated events and related-event grouping.            |
+|Resolver group, coverage, and escalation contact           |Route work to an available owner.                              |
+|Runbook and diagnostic links                               |Support repeatable investigation and first response.           |
+|Related change, maintenance, or incident ID where available|Provide operational context and link records.                  |
+
+Test retry behavior and duplicate handling. Define how late clear events, reopened failures, stale source state, and connector recovery affect the operational record.
+
+6.2 Required acceptance tests
+
+☐ A representative service failure produces the expected alert and service association.
+☐ Performance degradation is visible through an appropriate user-impact signal.
+☐ Duplicate events do not create uncontrolled duplicate incidents.
+☐ Delayed and out-of-order events are handled according to the agreed lifecycle.
+☐ Recovery/clear events update the operational view correctly.
+☐ Missing telemetry and connector failures are visible and assigned.
+☐ Maintenance suppression has a defined scope and expiry; detection resumes afterward.
+☐ An unavailable primary responder triggers the agreed escalation.
+☐ Correlation preserves visibility of separate failures and affected services.
+☐ Diagnostic links, operator access, and runbooks work for the actual support roles.
+☐ Functional recovery is validated using representative transactions or processing outcomes.
+☐ Command-center operators demonstrate the procedure and accept the handover.
+
+Service targets, alert thresholds, response objectives, and observation periods must be agreed for the service tier. This document does not impose generic recovery-time commitments.
+
+7. Two separate acceptance gates
+
+|Gate                                           |What it establishes                                                                      |Acceptance evidence                                                                                                                                                                |
+|-----------------------------------------------|-----------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|**MoM / command-center operational acceptance**|The service can be monitored, routed, and supported through the agreed operational model.|Tested monitoring, event lifecycle, routing, responder coverage, runbooks, diagnostic access, and recovery validation.                                                             |
+|**SRE engagement acceptance**                  |SRE has a defined and sustainable responsibility for improving or supporting the service.|Agreed scope, objectives, usable data, engineering access, participating technical/vendor owners, improvement priorities, staffing, and explicit on-call obligations if applicable.|
+
+A service may receive advisory SRE support, a defined improvement engagement, or continuing production involvement. Select the engagement according to criticality, engineering opportunity, and available capacity. 1, 8
+
+For vendor-supported applications, document access and modification limits. Use supported metrics, logs, diagnostic interfaces, and synthetic transactions where appropriate; assign product-code corrections to the vendor or application engineering team.
+
+8. Incident and improvement workflow
+
+1. Detect and qualify: command-center operators review the signal and available business impact. Monitoring engineering investigates signal or integration failures.
+2. Assign and acknowledge: route to the appropriate resolver. Escalate unaccepted assignments under the coverage agreement.
+3. Activate major-incident coordination when required: appoint incident command, communications, and technical leadership.
+4. Diagnose and restore: the affected technical teams investigate and execute approved actions. SRE joins under agreed triggers, such as complex cross-service degradation or failure of SRE-owned automation.
+5. Authorize exceptional actions: the relevant change or continuity authority approves actions requiring that authority.
+6. Validate recovery: application support validates functional outcomes; command center verifies service indicators; business/service owner confirms recovery where required by the service procedure.
+7. Close operational records: follow the agreed incident and episode lifecycle, preserving evidence and links.
+8. Learn and improve: the problem owner coordinates review; technical owners implement actions; SRE examines systemic weaknesses; monitoring engineering updates signals and correlation.
+9. Verify effectiveness: confirm that the improvement reduced recurrence, impact, risk, or operational effort before closing the action.
+
+Google’s incident and postmortem guidance supports explicit response roles and learning that leads to tracked corrective work. 3, 7
+
+9. Governance and measures of success
+
+9.1 Service reliability review
+
+The service owner leads the review with business, SRE, application support, monitoring, infrastructure, and development/vendor representatives as relevant.
+
+Review:
+
+• SLO results, business impact, and error-budget consumption.
+• Repeated incidents and effectiveness of completed actions.
+• Monitoring coverage, missed detections, noisy alerts, and telemetry gaps.
+• Capacity, recovery, dependency, and upcoming-change risks.
+• Manual operational effort and automation performance.
+• Vendor issues, funding needs, and ownership disputes.
+
+Each decision records one owner, priority, completion criterion, required evidence, and an agreed review point. The review cadence should match service criticality and operational needs.
+
+9.2 Team measures
+
+|Team / role                 |Recommended measures                                                                                                                                                                |
+|----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|**Business / service owner**|User-impact duration, failed/delayed business transactions, agreed SLO results, and unresolved service risks.                                                                       |
+|**Command center**          |Detection-to-acknowledgement and accepted-routing times, escalation adherence, assignment completeness, and communication quality.                                                  |
+|**Monitoring engineering**  |Tested service coverage, telemetry freshness, missed detections, actionable-alert ratio, connector reliability, and correct event lifecycle handling.                               |
+|**Application support**     |Validated restoration time, recurring application incidents, runbook success, vendor-case aging, and application change failures.                                                   |
+|**Development / vendors**   |Defect recurrence, delivery and effectiveness of fixes, diagnostic capability, and implementation of agreed reliability requirements.                                               |
+|**Infrastructure teams**    |Component reliability, capacity risk, change failures, restore/failover test results, and recurring infrastructure incidents.                                                       |
+|**SRE**                     |SLO attainment for engaged services, verified impact/recurrence reduction, sustained automation benefit, engineering capacity, and completion of effective reliability improvements.|
+
+Define measurement clocks and populations consistently. For example, restoration time ends at validated recovery, and its starting point should be the evidenced onset of impact where known. Separate results by service and severity; disclose unknown timestamps.
+
+For automation, evaluate human effort saved after accounting for maintenance, failed executions, and rework. Google recommends measuring toil and automation effectiveness; its 50% operational-work cap is an example of protecting SRE engineering capacity, not a universal staffing requirement. 2
+
+10. Relationship to ITIL practices
+
+|ITIL practice                      |Application in this model                                                                                                            |
+|-----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+|**Monitoring and event management**|Monitoring engineering provides the capability; command center performs operational event handling.                                  |
+|**Incident management**            |Command center and designated incident managers coordinate; technical resolver teams restore services.                               |
+|**Problem management**             |A named problem owner tracks causes, known workarounds, and corrective actions across technical teams.                               |
+|**Change enablement**              |The relevant authority authorizes changes; implementers provide risk, validation, and rollback evidence.                             |
+|**Service level management**       |Business, service owners, and technical teams agree and review service objectives; SRE supplies reliability measurement and analysis.|
+
+This mapping uses published ITIL 4 practice guidance. It is a practice alignment, not a certification or a claim of conformity with a prescribed organization structure. 15, 16, 17, 18, 19
+
+11. Reusable onboarding record
+
+Use one record per business service. Link to existing authoritative records rather than duplicating them where possible.
+
+|Field             |Value / evidence to supply                                                               |
+|------------------|-----------------------------------------------------------------------------------------|
+|Service identity  |Service ID, name, purpose, environment, catalog link.                                    |
+|Business context  |Business owner, critical journeys, operating periods, criticality, impact.               |
+|Accountability    |Named service owner and accountable technical owners.                                    |
+|Support           |Resolver groups, coverage, primary/backup contacts, vendor entitlement, escalation.      |
+|Dependencies      |Maintained map and relevant component/entity identifiers.                                |
+|Reliability       |SLI definitions, targets, windows, data sources, exclusions, error-budget policy.        |
+|Monitoring sources|Tools, connector owners, data access, data freshness, diagnostic links.                  |
+|Event behavior    |Identity, severity mapping, lifecycle, deduplication, correlation, maintenance rules.    |
+|Response          |Runbooks, incident integration, communications, recovery and closure criteria.           |
+|Readiness evidence|Acceptance-test results, operator handover, functional recovery validation.              |
+|SRE engagement    |Scope, engineering responsibilities, incident triggers, coverage, and support acceptance.|
+|Outstanding risks |Risk description, owner, acceptance authority, remediation, and review point.            |
+|Approval          |Service owner and accepting operational/engineering team representatives.                |
+
+12. References
+
+Official sources consulted on 7 October 2026. Section citations identify the supporting practice or product capability. Organizational assignments and local acceptance criteria are the proposed design in this document. Product documentation versions are stated where relevant.
+
+Google SRE
+
+1. Google, The Site Reliability Workbook: SRE Engagement Model. Scope, shared goals, service lifecycle, and engagement arrangements.
+Official source
+2. Google, The Site Reliability Workbook: Eliminating Toil. Operational workload, automation, and measurement of improvement.
+Official source
+3. Google, The Site Reliability Workbook: Incident Response. Incident command, communications, and operations roles.
+Official source
+4. Google, The Site Reliability Workbook: Implementing SLOs. SLIs, SLOs, error budgets, stakeholder agreement, and decision policies.
+Official source
+5. Google, Site Reliability Engineering: Monitoring Distributed Systems. Monitoring design, actionable signals, and service health.
+Official source
+6. Google, The Site Reliability Workbook: Alerting on SLOs. Alerting based on error-budget consumption.
+Official source
+7. Google, Site Reliability Engineering: Postmortem Culture: Learning from Failure. Blameless reviews and corrective actions.
+Official source
+8. Google, Site Reliability Engineering: The Evolving SRE Engagement Model. Production readiness and support acceptance.
+Official source
+
+Splunk IT Service Intelligence
+
+9. Splunk ITSI 5.0: Overview of the Service Analyzer. Service health and KPI investigation views.
+Official source
+10. Splunk ITSI 5.0: Ingest and normalize third-party alerts into ITSI. Source integration and event normalization.
+Official source
+11. Splunk ITSI 5.0: Overview of Episode Review. Episode ownership, triage, investigation, and lifecycle.
+Official source
+12. Splunk ITSI 5.0: Overview of aggregation policies. Event grouping, deduplication, and episode actions.
+Official source
+13. Splunk ITSI 4.20: Set KPI importance values. Weighted service-health scoring.
+Official source
+14. Splunk ITSI 4.21: Best practices for implementing Event Analytics. Normalization, correlation, and external-event onboarding.
+Official source
+
+ITIL practice guidance
+
+15. PeopleCert: ITIL 4 Practitioner - Monitoring and Event Management.
+Official source
+16. PeopleCert: ITIL 4 Practitioner - Incident Management.
+Official source
+17. PeopleCert: ITIL 4 Practitioner - Problem Management.
+Official source
+18. PeopleCert: ITIL 4 Practitioner - Change Enablement.
+Official source
+19. PeopleCert: ITIL 4 Practitioner - Service Level Management.
+Official source
