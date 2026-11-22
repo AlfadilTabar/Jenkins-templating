@@ -1,0 +1,129 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: firecrawl-db
+type: Opaque
+stringData:
+  POSTGRES_PASSWORD: "REPLACE_WITH_A_RANDOM_HEX_PASSWORD"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: firecrawl-data
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: firecrawl
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: firecrawl}
+  template:
+    metadata:
+      labels: {app: firecrawl}
+    spec:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      volumes:
+        - name: data
+          persistentVolumeClaim: {claimName: firecrawl-data}
+        - name: shm
+          emptyDir: {medium: Memory, sizeLimit: 512Mi}
+      containers:
+        - name: postgres
+          image: ghcr.io/firecrawl/nuq-postgres:latest
+          envFrom:
+            - secretRef: {name: firecrawl-db}
+          env:
+            - {name: POSTGRES_USER, value: postgres}
+            - {name: POSTGRES_DB, value: postgres}
+            - {name: PGDATA, value: /data/postgres}
+          volumeMounts:
+            - {name: data, mountPath: /data, subPath: pg}
+          readinessProbe:
+            exec: {command: [pg_isready, -h, "127.0.0.1", -U, postgres]}
+
+        - name: redis
+          image: redis:7-alpine
+          args: [redis-server, --bind, "127.0.0.1", --appendonly, "yes"]
+          volumeMounts:
+            - {name: data, mountPath: /data, subPath: redis}
+          readinessProbe:
+            exec: {command: [redis-cli, ping]}
+
+        - name: rabbitmq
+          image: rabbitmq:3.13-alpine
+          env:
+            - {name: RABBITMQ_NODENAME, value: rabbit@localhost}
+          volumeMounts:
+            - {name: data, mountPath: /var/lib/rabbitmq, subPath: rabbitmq}
+          readinessProbe:
+            exec: {command: [rabbitmq-diagnostics, -q, ping]}
+            timeoutSeconds: 10
+            periodSeconds: 20
+
+        - name: playwright
+          image: ghcr.io/firecrawl/playwright-service:latest
+          env:
+            - {name: PORT, value: "3003"}
+            - {name: MAX_CONCURRENT_PAGES, value: "2"}
+          volumeMounts:
+            - {name: shm, mountPath: /dev/shm}
+          readinessProbe:
+            tcpSocket: {port: 3003}
+
+        - name: api
+          image: ghcr.io/firecrawl/firecrawl:latest
+          args: [node, dist/src/harness.js, --start-docker]
+          envFrom:
+            - secretRef: {name: firecrawl-db}
+          env:
+            - {name: HOST, value: "0.0.0.0"}
+            - {name: PORT, value: "3002"}
+            - {name: ENV, value: local}
+            - {name: USE_DB_AUTHENTICATION, value: "false"}
+            - {name: POSTGRES_HOST, value: "127.0.0.1"}
+            - {name: POSTGRES_PORT, value: "5432"}
+            - {name: POSTGRES_USER, value: postgres}
+            - {name: POSTGRES_DB, value: postgres}
+            - {name: REDIS_URL, value: "redis://127.0.0.1:6379"}
+            - {name: REDIS_RATE_LIMIT_URL, value: "redis://127.0.0.1:6379"}
+            - {name: NUQ_RABBITMQ_URL, value: "amqp://127.0.0.1:5672"}
+            - {name: PLAYWRIGHT_MICROSERVICE_URL, value: "http://127.0.0.1:3003/scrape"}
+            - {name: NUM_WORKERS_PER_QUEUE, value: "2"}
+            - {name: CRAWL_CONCURRENT_REQUESTS, value: "2"}
+          readinessProbe:
+            httpGet: {path: /v0/health/readiness, port: 3002}
+
+        - name: mcp
+          image: ghcr.io/firecrawl/firecrawl-mcp-server:latest
+          env:
+            - {name: HTTP_STREAMABLE_SERVER, value: "true"}
+            - {name: HOST, value: "0.0.0.0"}
+            - {name: PORT, value: "3000"}
+            - {name: FIRECRAWL_API_URL, value: "http://127.0.0.1:3002"}
+            - name: POD_NAMESPACE
+              valueFrom: {fieldRef: {fieldPath: metadata.namespace}}
+            - name: FIRECRAWL_MCP_ALLOWED_HOSTS
+              value: "firecrawl-mcp,firecrawl-mcp.$(POD_NAMESPACE),firecrawl-mcp.$(POD_NAMESPACE).svc,firecrawl-mcp.$(POD_NAMESPACE).svc.cluster.local"
+          ports:
+            - {name: mcp, containerPort: 3000}
+          readinessProbe:
+            httpGet: {path: /health, port: mcp}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: firecrawl-mcp
+spec:
+  type: ClusterIP
+  selector: {app: firecrawl}
+  ports:
+    - {name: mcp, port: 3000, targetPort: mcp}
