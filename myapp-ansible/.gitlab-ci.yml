@@ -1,0 +1,89 @@
+stages: [check, operate]
+
+default:
+  image: python:3.12-slim
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y --no-install-recommends git openssh-client util-linux
+    - python -m pip install -r requirements.txt
+
+variables:
+  OPERATION:
+    value: "none"
+    options: ["none", deploy, status, promote]
+    description: Operation to enable on a protected branch pipeline
+  DEPLOY_ENV:
+    value: dev
+    options: [dev, test, prod, dr]
+    description: Environment to deploy or query, or the source environment for promotion
+  TARGET_ENV:
+    value: test
+    options: [test, prod, dr]
+    description: Target environment for the promotion candidate
+  COMPONENTS:
+    value: all
+    description: all or a comma-separated list such as orders,billing
+  CONFIG_REF:
+    value: ""
+    description: Full commit SHA from the configuration repository's default branch
+  CONFIG_PROJECT_PATH:
+    value: ""
+    description: GitLab namespace/project for the configuration repository
+
+check:
+  stage: check
+  script:
+    - python -m compileall -q tools tests
+    - bash tests/integration.sh
+
+.operation:
+  stage: operate
+  before_script:
+    - !reference [default, before_script]
+    - test -n "$CONFIG_REF" && test -n "$CONFIG_PROJECT_PATH"
+    - bash tools/ci_checkout.sh
+    - install -m 0700 -d ~/.ssh
+    - install -m 0600 "$SSH_PRIVATE_KEY" ~/.ssh/id_ed25519
+    - install -m 0600 "$SSH_KNOWN_HOSTS" ~/.ssh/known_hosts
+  resource_group: "myapp-$DEPLOY_ENV"
+  artifacts:
+    when: always
+    paths:
+      - reports/
+    expire_in: 30 days
+
+deploy:
+  extends: .operation
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_REF_PROTECTED == "true" && $CI_PIPELINE_SOURCE == "web" && $OPERATION == "deploy"'
+      when: manual
+  environment:
+    name: $DEPLOY_ENV
+    action: start
+  script:
+    - python tools/deploy.py deploy --config-repo .config-repo --config-ref "$CONFIG_REF" --environment "$DEPLOY_ENV" --components "$COMPONENTS"
+
+status:
+  extends: .operation
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_REF_PROTECTED == "true" && $CI_PIPELINE_SOURCE == "web" && $OPERATION == "status"'
+      when: manual
+  environment:
+    name: $DEPLOY_ENV
+    action: verify
+  script:
+    - python tools/deploy.py status --config-repo .config-repo --config-ref "$CONFIG_REF" --environment "$DEPLOY_ENV" --components "$COMPONENTS"
+
+prepare-promotion:
+  extends: .operation
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_REF_PROTECTED == "true" && $CI_PIPELINE_SOURCE == "web" && $OPERATION == "promote"'
+      when: manual
+  environment:
+    name: $DEPLOY_ENV
+    action: verify
+  script:
+    - >-
+      python tools/deploy.py promote --config-repo .config-repo --config-ref "$CONFIG_REF"
+      --environment "$DEPLOY_ENV" --to "$TARGET_ENV" --components "$COMPONENTS"
+      --output "reports/candidate/envs/$TARGET_ENV/deployment.yml"

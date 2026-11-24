@@ -1,0 +1,47 @@
+environment: prod
+deployment_order:
+- orders
+- billing
+components:
+  orders:
+    group: orders_nodes
+    service_user: myapp
+    serial: 1
+    hook_timeout: 30
+    health_retries: 10
+    health_delay: 3
+    artifact:
+      path: myapp-2026.11.10.2.tar.gz
+      sha256: 7c24465b7786d550f6fe988f24b5862a946359edac9d9075bc55e9d032140e05
+      bundle_version: 2026.11.10.2
+      component_version: 3.8.1
+    config:
+      values: envs/prod/files/orders/values.yml
+      files:
+      - source: envs/prod/files/orders/application.properties.j2
+        destination: config/application.properties
+        action: template
+      - source: envs/prod/files/orders/logback.xml
+        destination: config/logback.xml
+        action: copy
+  billing:
+    group: billing_nodes
+    service_user: myapp
+    serial: 1
+    hook_timeout: 30
+    health_retries: 10
+    health_delay: 3
+    artifact:
+      path: myapp-2026.11.10.2.tar.gz
+      sha256: 7c24465b7786d550f6fe988f24b5862a946359edac9d9075bc55e9d032140e05
+      bundle_version: 2026.11.10.2
+      component_version: 2.13.4
+    config:
+      values: envs/prod/files/billing/values.yml
+      files:
+      - source: envs/prod/files/billing/application.properties.j2
+        destination: config/application.properties
+        action: template
+      - source: envs/prod/files/billing/logback.xml
+        destination: config/logback.xml
+        action: copy
