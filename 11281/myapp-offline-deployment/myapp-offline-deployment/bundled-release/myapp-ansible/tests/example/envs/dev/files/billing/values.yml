@@ -1,0 +1,6 @@
+parameters:
+  db_url: "jdbc:postgresql://dev-db.example.invalid:5432/billing"
+  timeout_ms: "5000"
+secret_env:
+  db_password: MYAPP_SECRET_BILLING_DB_PASSWORD
+secret_revision: "1"

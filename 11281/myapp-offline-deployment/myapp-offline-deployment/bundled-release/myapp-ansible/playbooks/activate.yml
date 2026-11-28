@@ -1,0 +1,18 @@
+---
+- name: Activate the staged component in batches
+  hosts: "{{ component_group }}"
+  gather_facts: false
+  become: "{{ deploy_become | default(true) | bool }}"
+  serial: "{{ rollout_serial }}"
+  any_errors_fatal: true
+  vars_files:
+    - vars/host.yml
+  tasks:
+    - name: Switch release and check health with automatic rollback
+      ansible.builtin.script:
+        cmd: >-
+          {{ host_tool | quote }} activate {{ host_options }}
+          --release {{ release_id | quote }}
+        executable: /usr/bin/python3
+      register: activation
+      changed_when: activation.rc == 0 and (activation.stdout | from_json).changed

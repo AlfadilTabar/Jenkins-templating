@@ -1,0 +1,40 @@
+---
+- name: Stage component on every target before activation
+  hosts: "{{ component_group }}"
+  gather_facts: false
+  become: "{{ deploy_become | default(true) | bool }}"
+  any_errors_fatal: true
+  vars_files:
+    - vars/host.yml
+  tasks:
+    - name: Transfer and stage the component
+      block:
+        - name: Create a private transfer directory
+          ansible.builtin.tempfile:
+            state: directory
+            prefix: myapp-transfer-
+          register: transfer
+
+        - name: Transfer the staged package
+          no_log: true
+          ansible.builtin.copy:
+            src: "{{ component_archive }}"
+            dest: "{{ transfer.path }}/payload.tar"
+            mode: "0600"
+          diff: false
+
+        - name: Install the immutable release directory
+          ansible.builtin.script:
+            cmd: >-
+              {{ host_tool | quote }} stage {{ host_options }}
+              --release {{ release_id | quote }}
+              --archive {{ (transfer.path + '/payload.tar') | quote }}
+            executable: /usr/bin/python3
+          register: stage_result
+          changed_when: stage_result.rc == 0 and (stage_result.stdout | from_json).changed
+      always:
+        - name: Remove the transfer directory
+          ansible.builtin.file:
+            path: "{{ transfer.path }}"
+            state: absent
+          when: transfer.path is defined

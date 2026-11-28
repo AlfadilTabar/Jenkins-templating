@@ -1,0 +1,8 @@
+---
+host_options: >-
+  --root {{ deploy_root | quote }}
+  --component {{ component_name | quote }}
+  --user {{ component_user | quote }}
+  --timeout {{ hook_timeout }}
+  --retries {{ health_retries }}
+  --delay {{ health_delay }}
