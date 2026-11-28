@@ -1,0 +1,85 @@
+environment: dr
+deployment:
+  mode: selective
+  selective:
+    components:
+    - payment
+    - orders
+  full:
+    components: all
+  stages:
+  - name: core-services
+    components:
+    - payment
+    - orders
+    max_parallel: 2
+  - name: reporting
+    components:
+    - reporting
+    max_parallel: 1
+  host_waves:
+  - - dr-app-01
+  - - dr-app-02
+    - dr-app-03
+components:
+  payment:
+    group: payment_nodes
+    service_user: myapp
+    hook_timeout: 30
+    health_retries: 10
+    health_delay: 3
+    artifact:
+      version: '10.0'
+      path: payment/10.0/payment-10.0.tar.gz
+      sha256: 4c766ff527445fcb34d1c8e2462fefc6ad65ee90513b788a554d0616f77ff0ad
+    config:
+      values: envs/dr/files/payment/values.yml
+      files:
+      - source: envs/dr/files/payment/application.properties.j2
+        destination: config/application.properties
+        action: template
+      - source: envs/dr/files/payment/logback.xml
+        destination: config/logback.xml
+        action: copy
+  orders:
+    group: orders_nodes
+    service_user: myapp
+    hook_timeout: 30
+    health_retries: 10
+    health_delay: 3
+    artifact:
+      version: '11.1'
+      path: orders/11.1/orders-11.1.tar.gz
+      sha256: 8aabd126a543b153283fbaf550b475719b7ce1a5aa7ffb3306f4c094d8945cef
+    config:
+      values: envs/dr/files/orders/values.yml
+      files:
+      - source: envs/dr/files/orders/application.properties.j2
+        destination: config/application.properties
+        action: template
+      - source: envs/dr/files/orders/logback.xml
+        destination: config/logback.xml
+        action: copy
+    host_waves:
+    - - dr-app-03
+    - - dr-app-01
+    - - dr-app-02
+  reporting:
+    group: reporting_nodes
+    service_user: myapp
+    hook_timeout: 30
+    health_retries: 10
+    health_delay: 3
+    artifact:
+      version: '4.0'
+      path: reporting/4.0/reporting-4.0.tar.gz
+      sha256: b0107c66770556ff35350c925ceea90409ed1e8eeff60e2b01a80c1f043b683b
+    config:
+      values: envs/dr/files/reporting/values.yml
+      files:
+      - source: envs/dr/files/reporting/application.properties.j2
+        destination: config/application.properties
+        action: template
+      - source: envs/dr/files/reporting/logback.xml
+        destination: config/logback.xml
+        action: copy

@@ -1,0 +1,25 @@
+---
+- name: Report the active component on each target
+  hosts: "{{ component_group }}"
+  gather_facts: false
+  become: "{{ deploy_become | default(true) | bool }}"
+  vars_files:
+    - vars/host.yml
+  tasks:
+    - name: Read the active receipt and check application health
+      ansible.builtin.script:
+        cmd: "{{ host_tool | quote }} status {{ host_options }}"
+        executable: /usr/bin/python3
+      register: status_result
+      changed_when: false
+
+    - name: Save the host result on the controller
+      ansible.builtin.copy:
+        content: "{{ status_result.stdout | from_json | to_json }}"
+        dest: "{{ status_dir }}/{{ inventory_hostname | hash('sha256') }}.json"
+        mode: "0600"
+      delegate_to: localhost
+      become: false
+      vars:
+        ansible_connection: local
+        ansible_python_interpreter: "{{ ansible_playbook_python }}"

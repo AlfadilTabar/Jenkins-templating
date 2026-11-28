@@ -1,0 +1,85 @@
+environment: dev
+deployment:
+  mode: selective
+  selective:
+    components:
+    - payment
+    - orders
+  full:
+    components: all
+  stages:
+  - name: core-services
+    components:
+    - payment
+    - orders
+    max_parallel: 2
+  - name: reporting
+    components:
+    - reporting
+    max_parallel: 1
+  host_waves:
+  - - dev-app-01
+  - - dev-app-02
+    - dev-app-03
+components:
+  payment:
+    group: payment_nodes
+    service_user: myapp
+    hook_timeout: 30
+    health_retries: 10
+    health_delay: 3
+    artifact:
+      version: '10.1'
+      path: payment/10.1/payment-10.1.tar.gz
+      sha256: 103188c03f8f22d0e3ce1a89445dd73aa5d2a850a7648141e6711b997d6b00ae
+    config:
+      values: envs/dev/files/payment/values.yml
+      files:
+      - source: envs/dev/files/payment/application.properties.j2
+        destination: config/application.properties
+        action: template
+      - source: envs/dev/files/payment/logback.xml
+        destination: config/logback.xml
+        action: copy
+  orders:
+    group: orders_nodes
+    service_user: myapp
+    hook_timeout: 30
+    health_retries: 10
+    health_delay: 3
+    artifact:
+      version: '11.2'
+      path: orders/11.2/orders-11.2.tar.gz
+      sha256: 37419573b34fe4d3a8ef5c3f2ef4321ea5d61d4cd55e75601ebdbd5e65ce4e20
+    config:
+      values: envs/dev/files/orders/values.yml
+      files:
+      - source: envs/dev/files/orders/application.properties.j2
+        destination: config/application.properties
+        action: template
+      - source: envs/dev/files/orders/logback.xml
+        destination: config/logback.xml
+        action: copy
+    host_waves:
+    - - dev-app-03
+    - - dev-app-01
+    - - dev-app-02
+  reporting:
+    group: reporting_nodes
+    service_user: myapp
+    hook_timeout: 30
+    health_retries: 10
+    health_delay: 3
+    artifact:
+      version: '4.0'
+      path: reporting/4.0/reporting-4.0.tar.gz
+      sha256: b0107c66770556ff35350c925ceea90409ed1e8eeff60e2b01a80c1f043b683b
+    config:
+      values: envs/dev/files/reporting/values.yml
+      files:
+      - source: envs/dev/files/reporting/application.properties.j2
+        destination: config/application.properties
+        action: template
+      - source: envs/dev/files/reporting/logback.xml
+        destination: config/logback.xml
+        action: copy

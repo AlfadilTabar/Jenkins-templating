@@ -1,0 +1,6 @@
+parameters:
+  db_url: "jdbc:postgresql://test-db.example.invalid:5432/reporting"
+  timeout_ms: "5000"
+secret_env:
+  db_password: MYAPP_SECRET_REPORTING_DB_PASSWORD
+secret_revision: "1"

@@ -1,0 +1,4 @@
+.venv/
+.config-repo/
+reports/
+__pycache__/
